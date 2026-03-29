@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Student project website for CO3135 — Programming for Artificial Intelligence and Data Science (HCMUT, VNU-HCM)."
+    />
+    <title>CO3135 — AI & Data Science Projects</title>
+
+    <style>
+      :root {
+        --bg: #f7f8fb;
+        --bg-2: #ffffff;
+        --card: rgba(255, 255, 255, 0.92);
+        --card-strong: rgba(255, 255, 255, 0.98);
+        --text: rgba(15, 23, 42, 0.96); /* slate-900 */
+        --muted: rgba(51, 65, 85, 0.82); /* slate-700 */
+        --muted-2: rgba(71, 85, 105, 0.72); /* slate-600 */
+        --border: rgba(15, 23, 42, 0.1);
+        --brand: #2563eb; /* blue */
+        --brand-2: #7c3aed; /* violet */
+        --shadow: 0 16px 38px rgba(15, 23, 42, 0.1);
+        --radius: 16px;
+        --radius-sm: 12px;
+        --max: 1100px;
+
+        --font:
+          ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+          Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font);
+        color: var(--text);
+        background:
+          radial-gradient(
+            900px 600px at 10% 10%,
+            rgba(37, 99, 235, 0.1),
+            transparent 60%
+          ),
+          radial-gradient(
+            900px 600px at 90% 20%,
+            rgba(124, 58, 237, 0.1),
+            transparent 55%
+          ),
+          linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 60%, var(--bg) 100%);
+        line-height: 1.55;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .skip {
+        position: absolute;
+        left: -999px;
+        top: auto;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+      }
+      .skip:focus {
+        left: 16px;
+        top: 14px;
+        width: auto;
+        height: auto;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid var(--border);
+        outline: none;
+        z-index: 1000;
+      }
+
+      .wrap {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0 18px;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(255, 255, 255, 0.72);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 14px 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 220px;
+      }
+
+      .brand-badge {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        background: linear-gradient(
+          135deg,
+          rgba(37, 99, 235, 0.95),
+          rgba(124, 58, 237, 0.85)
+        );
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.18);
+      }
+
+      .brand-title {
+        font-weight: 650;
+        letter-spacing: 0.2px;
+        font-size: 14px;
+        color: rgba(15, 23, 42, 0.92);
+      }
+
+      .brand-sub {
+        font-size: 12px;
+        color: var(--muted-2);
+        margin-top: 1px;
+      }
+
+      .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .chip {
+        padding: 9px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        background: rgba(255, 255, 255, 0.85);
+        color: rgba(15, 23, 42, 0.84);
+        font-size: 13px;
+        transition:
+          transform 180ms ease,
+          background 180ms ease,
+          border-color 180ms ease;
+      }
+      .chip:hover {
+        transform: translateY(-1px);
+        border-color: rgba(15, 23, 42, 0.18);
+        background: rgba(255, 255, 255, 0.98);
+      }
+
+      .hero {
+        padding: 58px 0 26px;
+      }
+
+      .hero-grid {
+        display: flex;
+        grid-template-columns: 1.3fr 0.7fr;
+        gap: 22px;
+        align-items: stretch;
+      }
+
+      .hero-card {
+        border-radius: var(--radius);
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.98),
+          rgba(255, 255, 255, 0.86)
+        );
+        box-shadow: var(--shadow);
+        padding: 26px;
+        overflow: hidden;
+        position: relative;
+        min-height: 240px;
+        width: 100%;
+      }
+
+      .hero-card::before {
+        content: "";
+        position: absolute;
+        inset: -120px -80px auto auto;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(
+          circle at 30% 30%,
+          rgba(37, 99, 235, 0.24),
+          transparent 62%
+        );
+        filter: blur(2px);
+        transform: rotate(12deg);
+        opacity: 0.9;
+        pointer-events: none;
+      }
+
+      h1 {
+        margin: 14px 0 8px;
+        font-size: clamp(28px, 3.5vw, 44px);
+        line-height: 1.06;
+        letter-spacing: -0.6px;
+      }
+
+      .hero-subtitle {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      .hero-meta {
+        margin-top: 18px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        color: rgba(15, 23, 42, 0.78);
+        font-size: 13px;
+      }
+
+      .pill {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(15, 23, 42, 0.1);
+      }
+
+      section {
+        padding: 26px 0;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 14px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: -0.2px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 14px;
+      }
+
+      .col-6 {
+        grid-column: span 6;
+      }
+      .col-4 {
+        grid-column: span 4;
+      }
+
+      .card {
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        background: rgba(255, 255, 255, 0.9);
+        padding: 16px;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1);
+        transition:
+          transform 180ms ease,
+          background 180ms ease,
+          border-color 180ms ease;
+      }
+
+      .card.hover:hover {
+        transform: translateY(-3px);
+        background: rgba(255, 255, 255, 0.98);
+        border-color: rgba(15, 23, 42, 0.16);
+      }
+
+      .member {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        background:
+          radial-gradient(
+            circle at 30% 30%,
+            rgba(37, 99, 235, 0.18),
+            transparent 60%
+          ),
+          radial-gradient(
+            circle at 70% 60%,
+            rgba(124, 58, 237, 0.14),
+            transparent 55%
+          ),
+          rgba(255, 255, 255, 0.92);
+        display: grid;
+        place-items: center;
+        color: rgba(15, 23, 42, 0.86);
+        font-weight: 650;
+        letter-spacing: 0.6px;
+      }
+
+      .member h3 {
+        margin: 0;
+        font-size: 15px;
+        letter-spacing: -0.2px;
+      }
+      .member .id {
+        margin-top: 2px;
+        color: var(--muted-2);
+        font-size: 13px;
+      }
+
+      .assignment h3 {
+        margin: 0;
+        font-size: 15px;
+      }
+
+      .assignment p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .assignment .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 14px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: rgba(255, 255, 255, 0.86);
+        color: rgba(15, 23, 42, 0.88);
+        font-size: 13px;
+        transition:
+          transform 180ms ease,
+          background 180ms ease,
+          border-color 180ms ease;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.98);
+        border-color: rgba(15, 23, 42, 0.18);
+      }
+
+      footer {
+        margin-top: 26px;
+        padding: 26px 0 40px;
+        border-top: 1px solid rgba(15, 23, 42, 0.08);
+        color: rgba(51, 65, 85, 0.86);
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .small {
+        font-size: 13px;
+        color: black;
+      }
+
+      /* Responsive */
+      @media (max-width: 900px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+        .brand {
+          min-width: unset;
+        }
+        .footer-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .col-6 {
+          grid-column: span 12;
+        }
+        .col-4 {
+          grid-column: span 12;
+        }
+        .nav {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .nav-links {
+          justify-content: flex-start;
+        }
+      }
+
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        .chip,
+        .btn,
+        .card {
+          transition: none !important;
+        }
+        .card.hover:hover,
+        .btn:hover,
+        .chip:hover {
+          transform: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header>
+      <div class="wrap">
+        <div class="nav" aria-label="Primary">
+          <a class="brand" href="#top">
+            <span class="brand-badge" aria-hidden="true"></span>
+            <span>
+              <div class="brand-title">CO3135 • Project Website</div>
+              <div class="brand-sub">HCMUT — VNU-HCM • Semester I (2025–2026)</div>
+            </span>
+          </a>
+
+          <nav class="nav-links" aria-label="Sections">
+            <a class="chip" href="#top">Home</a>
+            <a class="chip" href="#assignments">Assignments</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <div id="top" class="hero">
+        <div class="wrap">
+          <div class="hero-grid">
+            <div class="hero-card">
+              <h1>Exploratory Data Analysis Projects</h1>
+              <p class="hero-subtitle">
+                Programming for Artificial Intelligence and Data Science (CO3135)<br />
+                Ho Chi Minh City University of Technology (HCMUT) — VNU-HCM
+              </p>
+              <p class="hero-subtitle">
+                This website presents our group’s course assignments, including exploratory data analysis and AI-related programming tasks.
+              </p>
+
+              <div class="hero-meta" aria-label="Course metadata">
+                <span class="pill">Semester II — Academic Year 2025–2026</span>
+                <span class="pill">Department of Computer Science</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section id="team">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Team Members</h2>
+          </div>
+
+          <div class="grid" role="list">
+            <div class="card col-4" role="listitem">
+              <div class="member">
+                <div class="avatar" aria-hidden="true">L</div>
+                <div>
+                  <h3>Nguyễn Châu Hoàng Long</h3>
+                  <div class="id">Student ID: 2252444</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card col-4" role="listitem">
+              <div class="member">
+                <div class="avatar" aria-hidden="true">M</div>
+                <div>
+                  <h3>Trịnh Anh Minh</h3>
+                  <div class="id">Student ID: 2252493</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card col-4" role="listitem">
+              <div class="member">
+                <div class="avatar" aria-hidden="true">N</div>
+                <div>
+                  <h3>Hồ Khánh Nam</h3>
+                  <div class="id">Student ID: 2252500</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card col-4" role="listitem">
+              <div class="member">
+                <div class="avatar" aria-hidden="true">L</div>
+                <div>
+                  <h3>Cao Ngọc Lâm</h3>
+                  <div class="id">Student ID: 2252419</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="assignments">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Assignments</h2>
+          </div>
+
+          <div class="grid">
+            <div class="card hover col-6 assignment">
+              <h3>Assignment 1 — Exploratory Data Analysis (EDA)</h3>
+              <p>
+                This assignment focuses on performing exploratory data analysis on different types of datasets including tabular data, text data, and image data.
+              </p>
+              <div class="row">
+                <a class="btn" href="/assignment1">View Assignment 1</a>
+              </div>
+            </div>
+
+            <div class="card col-6" aria-label="Placeholder for future assignments">
+              <h3 style="margin: 0; font-size: 15px">More coming soon</h3>
+              <p style="margin: 10px 0 0; color: var(--muted); font-size: 14px">
+                Add more assignment cards as you progress through the course.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer id="footer">
+      <div class="wrap">
+        <div class="footer-grid">
+          <div>
+            <div style="font-weight: 650; color: black">
+              Programming for Artificial Intelligence and Data Science (CO3135)
+            </div>
+            <div class="small">Ho Chi Minh City University of Technology (HCMUT) — VNU-HCM</div>
+            <div class="small">© 2026</div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Minimal enhancement: highlight active nav chip while scrolling.
+      (function () {
+        const links = Array.from(document.querySelectorAll(".nav-links a"));
+        const targets = links
+          .map((a) => document.querySelector(a.getAttribute("href")))
+          .filter(Boolean);
+
+        if (!("IntersectionObserver" in window) || targets.length === 0) return;
+
+        const setActive = (id) => {
+          links.forEach((a) => {
+            const active = a.getAttribute("href") === "#" + id;
+            a.style.borderColor = active
+              ? "rgba(37,99,235,0.32)"
+              : "rgba(15,23,42,0.10)";
+            a.style.background = active
+              ? "rgba(37,99,235,0.08)"
+              : "rgba(255,255,255,0.85)";
+          });
+        };
+
+        const visible = new Set();
+
+        const pickBest = () => {
+          if (visible.size === 0) return;
+          let bestId = null;
+          let bestTop = Infinity;
+          visible.forEach((id) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const top = Math.abs(el.getBoundingClientRect().top);
+            if (top < bestTop) {
+              bestTop = top;
+              bestId = id;
+            }
+          });
+          if (bestId) setActive(bestId);
+        };
+
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (!e.target || !e.target.id) continue;
+              if (e.isIntersecting) visible.add(e.target.id);
+              else visible.delete(e.target.id);
+            }
+            pickBest();
+          },
+          { root: null, rootMargin: "-35% 0px -55% 0px", threshold: 0 },
+        );
+
+        targets.forEach((t) => io.observe(t));
+
+        {
+          const id = location.hash.replace(/^#/, "");
+          if (id) setActive(id);
+          else if (targets[0] && targets[0].id) setActive(targets[0].id);
+        }
+
+        window.addEventListener(
+          "hashchange",
+          () => {
+            const id = location.hash.replace(/^#/, "");
+            if (id) setActive(id);
+          },
+          { passive: true },
+        );
+      })();
+    </script>
+  </body>
+</html>

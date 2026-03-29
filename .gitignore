@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data / outputs
+*.csv~
+*.parquet
+*.feather
+*.pkl
+*.joblib
+
+# Plotly / HTML exports (keep templates tracked, but ignore ad-hoc exports)
+*.html~
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Logs
+*.log
+

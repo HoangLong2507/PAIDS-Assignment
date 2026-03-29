@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tabular EDA</title>
+
+    <!-- Plotly JS via CDN (keep consistent with Text page) -->
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+
+    <link rel="stylesheet" href="/static/assignment1.styles.css" />
+  </head>
+
+  <body>
+    <header class="topbar">
+      <div class="container nav">
+        <a class="brand" href="#">
+          <span class="brand-badge" aria-hidden="true"></span>
+          <span class="brand-text">
+            <span class="brand-title">Tabular EDA</span>
+          </span>
+        </a>
+
+        <nav class="toc">
+          <a href="#overview">Overview</a>
+          <a href="#missing">Missing</a>
+          <a href="#numerical">Numerical</a>
+          <a href="#categorical">Categorical</a>
+          <a href="#target">Target</a>
+          <a href="#corr">Correlation</a>
+          <a href="#outliers">Outliers</a>
+          <a href="#relations">Relationships</a>
+          <a href="#samples">Samples</a>
+          <a href="#insights">Insights</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="return-btn">
+        <a class="btn" href="/assignment1" style="text-decoration: none; color: black">← Back</a>
+      </div>
+
+      <section class="card" id="overview">
+        <h3>📊 1. Dataset Overview</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          First look at dataset structure: number of samples, number of
+          features, and feature types.
+        </h4>
+
+        <div class="grid-4">
+          <div class="metric">
+            <div class="metric-label">Total Samples</div>
+            <div class="metric-value">{{ overview.total_samples }}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Total Features</div>
+            <div class="metric-value">{{ overview.total_features }}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Numerical Features</div>
+            <div class="metric-value">{{ overview.numerical_features }}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Categorical Features</div>
+            <div class="metric-value">{{ overview.categorical_features }}</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="missing">
+        <h3>🔍 2. Missing Values Analysis</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Calculate missing counts and percentages per column.
+        </h4>
+
+        <div class="grid-2">
+          <div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Feature</th>
+                  <th>Count</th>
+                  <th>Percent (%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in missing_table %}
+                <tr>
+                  <td>{{ row['Feature'] }}</td>
+                  <td>{{ '{:,}'.format(row['Count']) }}</td>
+                  <td>{{ row['Percent (%)'] }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="plot">{{ fig_missing | safe }}</div>
+        </div>
+      </section>
+
+      <section class="card" id="numerical">
+        <h3>📈 3. Numerical Features Distribution</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Analyze quantitative variables like release year.
+        </h4>
+
+        <div class="plot">{{ fig_release_year | safe }}</div>
+
+        <div class="grid-4">
+          <div class="metric">
+            <div class="metric-label">Mean</div>
+            <div class="metric-value">{{ '%.2f'|format(release_stats.mean) }}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Median</div>
+            <div class="metric-value">{{ '%.2f'|format(release_stats.median) }}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Std</div>
+            <div class="metric-value">{{ '%.2f'|format(release_stats.std) }}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Min / Max</div>
+            <div class="metric-value">{{ release_stats.min|int }} / {{ release_stats.max|int }}</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="categorical">
+        <h3>📊 4. Categorical Features Distribution</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Top 15 categories for each categorical feature.
+        </h4>
+
+        {% for feature, payload in cat_payload.items() %}
+        <div class="card" style="margin: 12px 0">
+          <h3 style="margin-bottom: 6px">{{ feature.replace('_',' ').title() }}</h3>
+          <div class="grid-2">
+            <div class="plot">{{ payload.fig | safe }}</div>
+            <div>
+              <div class="metric">
+                <div class="metric-label">Missing</div>
+                <div class="metric-value">
+                  {{ '{:,}'.format(payload.stats.missing_count) }}
+                </div>
+                <div class="metric-foot">{{ '%.2f'|format(payload.stats.missing_pct) }}%</div>
+              </div>
+              <div style="height: 12px"></div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Top categories</th>
+                    <th>Count</th>
+                    <th>%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in payload.stats.top10 %}
+                  <tr>
+                    <td>{{ row.category }}</td>
+                    <td>{{ '{:,}'.format(row.count) }}</td>
+                    <td>{{ '%.2f'|format(row.pct) }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </section>
+
+      <section class="card" id="target">
+        <h3>🎯 5. Target Variable Distribution</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Content Type split: Movies vs TV Shows.
+        </h4>
+
+        <div class="grid-2">
+          <div class="plot">{{ fig_target | safe }}</div>
+          <div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Count</th>
+                  <th>%</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in target_dist %}
+                <tr>
+                  <td>{{ row.label }}</td>
+                  <td>{{ '{:,}'.format(row.count) }}</td>
+                  <td>{{ '%.2f'|format(row.pct) }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="corr">
+        <h3>🔗 6. Correlation Analysis</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Correlation among numerical features (if available).
+        </h4>
+
+        {% if fig_corr %}
+        <div class="plot">{{ fig_corr | safe }}</div>
+
+        <details class="details" style="margin-top: 12px">
+          <summary>High correlations (|r| &gt; 0.5)</summary>
+          <div class="details-body">
+            {% if high_corrs|length == 0 %}
+            <p>None found in this dataset.</p>
+            {% else %}
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Feature A</th>
+                  <th>Feature B</th>
+                  <th>r</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in high_corrs %}
+                <tr>
+                  <td>{{ row.a }}</td>
+                  <td>{{ row.b }}</td>
+                  <td>{{ '%.3f'|format(row.r) }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% endif %}
+          </div>
+        </details>
+        {% else %}
+        <p>Not enough numerical features for correlation analysis.</p>
+        {% endif %}
+      </section>
+
+      <section class="card" id="outliers">
+        <h3>📦 7. Outlier Detection (IQR)</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Identify outliers for release year using a box plot and IQR.
+        </h4>
+
+        <div class="grid-2">
+          <div class="plot">{{ fig_outlier | safe }}</div>
+          <div>
+            <div class="grid-2">
+              <div class="metric">
+                <div class="metric-label">Lower Bound</div>
+                <div class="metric-value">{{ '%.2f'|format(outlier_stats.lower_bound) }}</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Upper Bound</div>
+                <div class="metric-value">{{ '%.2f'|format(outlier_stats.upper_bound) }}</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label"># Outliers</div>
+                <div class="metric-value">{{ '{:,}'.format(outlier_stats.outlier_count) }}</div>
+                <div class="metric-foot">{{ '%.2f'|format(outlier_stats.outlier_pct) }}%</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Outlier Range</div>
+                <div class="metric-value">
+                  {% if outlier_stats.min_outlier is none %}None{% else %}{{ outlier_stats.min_outlier|int }} - {{ outlier_stats.max_outlier|int }}{% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="relations">
+        <h3>🎯 8. Relationship between Target and Other Features</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Stacked percent bars: Movie vs TV Show across top categories.
+        </h4>
+
+        {% for feature, fig in rel_figs.items() %}
+        <div class="plot" style="margin-bottom: 16px">{{ fig | safe }}</div>
+        {% endfor %}
+      </section>
+
+      <section class="card" id="samples">
+        <h3>📝 9. Sample Data Rows</h3>
+        <div class="grid-2">
+          <div>
+            <h4 style="margin: 0 0 10px">Movies Samples</h4>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>title</th>
+                  <th>country</th>
+                  <th>release_year</th>
+                  <th>rating</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in samples['Movie'] %}
+                <tr>
+                  <td>{{ row.title }}</td>
+                  <td>{{ row.country }}</td>
+                  <td>{{ row.release_year }}</td>
+                  <td>{{ row.rating }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h4 style="margin: 0 0 10px">TV Shows Samples</h4>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>title</th>
+                  <th>country</th>
+                  <th>release_year</th>
+                  <th>rating</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in samples['TV Show'] %}
+                <tr>
+                  <td>{{ row.title }}</td>
+                  <td>{{ row.country }}</td>
+                  <td>{{ row.release_year }}</td>
+                  <td>{{ row.rating }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="insights">
+        <h3>💡 10. Key Insights</h3>
+        <ol>
+          <li><strong>Content dominance:</strong> Movies represent ~70% of the dataset.</li>
+          <li><strong>Data quality:</strong> Significant missing data in <code>director</code>.</li>
+          <li><strong>Recency:</strong> Most content was released after 2015, with outliers representing older classics.</li>
+          <li><strong>Ratings:</strong> TV-MA is a frequent rating, targeted toward mature audiences.</li>
+          <li><strong>Production:</strong> The USA is a leading country in content production.</li>
+        </ol>
+      </section>
+    </main>
+  </body>
+</html>
