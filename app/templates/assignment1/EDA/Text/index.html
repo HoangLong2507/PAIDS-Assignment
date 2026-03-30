@@ -100,10 +100,30 @@
           Visualize the balance between Spam and Ham classes. This is crucial to
           know if we are dealing with an imbalanced classification problem.
         </h4>
+        <!-- Show plots in a single column on small screens, stacked vertically.
+             Under each plot we render a dedicated "output" block with insights
+             copied from the notebook. Each plot+output pair is independent. -->
         <div class="grid-2">
-          <div class="plot">{{ fig_bar | safe }}</div>
-          <div class="plot">{{ fig_pie | safe }}</div>
+          <div>
+            <div class="plot">{{ fig_bar | safe }}</div>
+          </div>
+
+          <div>
+            <div class="plot">{{ fig_pie | safe }}</div>
         </div>
+        </div>
+                <div class="insight-box">
+          <div class="insight-summary">The dataset is slightly imbalanced.</div>
+          <pre class="insight-table">Category Distribution:
+type
+not spam    57
+spam        26
+Name: count, dtype: int64
+
+Total emails: 83
+Most common: not spam (57 emails)
+Least common: spam (26 emails)</pre>
+          </div>
       </section>
 
       <section class="card" id="length-distribution">
@@ -250,6 +270,13 @@
           overlap in terms of vocabulary and common terms.
         </p>
         <div class="plot">{{ sim_fig | safe }}</div>
+        <div class="insight-box">
+          <div class="insight-summary">Category Similarity Insights:</div>
+          <pre class="insight-table">- NOT SPAM internal consistency: 0.0405
+- SPAM internal consistency: 0.0587
+- Cross-category similarity: 0.0140
+  -> Result: Very distinct vocabulary between Spam and Not Spam.</pre>
+        </div>
       </section>
       
       <section class="card" id="key-insights">

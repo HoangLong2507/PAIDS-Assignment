@@ -139,9 +139,14 @@ def assignment1_tabular(request: Request):
     fig_outlier, outlier_stats = tabular_eda.outlier_iqr_release_year(df)
     fig_outlier_html = fig_outlier.to_html(include_plotlyjs=False, full_html=False)
 
-    rel_figs = {
-        feature: fig.to_html(include_plotlyjs=False, full_html=False)
-        for feature, fig in tabular_eda.fig_target_relationships(df).items()
+    # fig_target_relationships now returns (fig, stats) per feature
+    rel_results = tabular_eda.fig_target_relationships(df)
+    rel_payload = {
+        feature: {
+            "fig": fig.to_html(include_plotlyjs=False, full_html=False),
+            "stats": stats,
+        }
+        for feature, (fig, stats) in rel_results.items()
     }
 
     samples = tabular_eda.sample_rows(df, n=3)
@@ -163,7 +168,7 @@ def assignment1_tabular(request: Request):
             "high_corrs": high_corrs,
             "fig_outlier": fig_outlier_html,
             "outlier_stats": outlier_stats,
-            "rel_figs": rel_figs,
+            "rel_figs": rel_payload,
             "samples": samples,
         },
     )

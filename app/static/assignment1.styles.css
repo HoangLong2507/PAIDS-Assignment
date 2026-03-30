@@ -227,6 +227,31 @@ html {
   margin-top: 12px;
 }
 
+.insight-box {
+  margin-top: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: linear-gradient(180deg, rgba(248,250,252,0.98), rgba(255,255,255,0.96));
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.insight-summary {
+  font-weight: 700;
+  color: rgba(15,23,42,0.9);
+  margin-bottom: 8px;
+}
+
+.insight-table {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+  background: rgba(15,23,42,0.02);
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: rgba(15,23,42,0.9);
+}
+
 .remark-title {
   font-size: 12px;
   letter-spacing: 0.2px;
@@ -395,7 +420,7 @@ html {
 }
 
 .return-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: flex-start;
   align-items: center;
@@ -474,4 +499,29 @@ footer {
 
 code {
   color: rgba(37, 99, 235, 0.95);
+}
+
+/* Section 9 samples: ensure large tables scroll horizontally instead of breaking layout */
+#samples .table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  /* subtle outer wrapper so sample tables match other cards/tables */
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+}
+
+#samples .table-wrap .table {
+  min-width: 600px; /* allow tables to be wider than card and enable scrolling */
+  border: 1px solid rgba(15, 23, 42, 0.08); /* inner table border for structure */
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+  border-radius: 10px;
+}
+
+@media (max-width: 800px) {
+  #samples .table-wrap {
+    overflow-x: auto;
+  }
 }

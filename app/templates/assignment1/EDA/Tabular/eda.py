@@ -393,12 +393,12 @@ def outlier_iqr_release_year(df: pd.DataFrame) -> Tuple[go.Figure, Dict[str, obj
     return fig, stats
 
 
-def fig_target_relationships(df: pd.DataFrame) -> Dict[str, go.Figure]:
+def fig_target_relationships(df: pd.DataFrame) -> Dict[str, Tuple[go.Figure, Dict[str, object]]]:
     target_col = "type"
     cat_cols = df.select_dtypes(include=["object"]).columns.tolist()
     cols_to_plot = [c for c in cat_cols if c not in ["show_id", "title", "description", "type"]]
 
-    figs: Dict[str, go.Figure] = {}
+    figs: Dict[str, Tuple[go.Figure, Dict[str, object]]] = {}
 
     for feature in cols_to_plot:
         if feature in ["country", "cast", "director", "listed_in"]:
@@ -453,7 +453,26 @@ def fig_target_relationships(df: pd.DataFrame) -> Dict[str, go.Figure]:
             margin=dict(l=40, r=20, t=80, b=140),
         )
 
-        figs[feature] = fig
+        # Build a compact table showing the top-5 categories by the sort_col
+        top_n = 5
+        try:
+            top_df = crosstab.nlargest(top_n, sort_col)
+        except Exception:
+            # Fallback: take first top_n rows if nlargest fails
+            top_df = crosstab.head(top_n)
+
+        top_rows: List[Dict[str, object]] = []
+        for idx in top_df.index.tolist():
+            movie_pct = float(top_df.loc[idx, "Movie"]) if "Movie" in top_df.columns else 0.0
+            tv_pct = float(top_df.loc[idx, "TV Show"]) if "TV Show" in top_df.columns else 0.0
+            top_rows.append({
+                "category": str(idx),
+                "movie_pct": movie_pct,
+                "tv_pct": tv_pct,
+                "total_pct": float(movie_pct + tv_pct),
+            })
+
+        figs[feature] = (fig, {"top_rows": top_rows, "sort_col": sort_col})
 
     return figs
 
