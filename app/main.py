@@ -10,6 +10,7 @@ from fastapi.templating import Jinja2Templates
 
 from .templates.assignment1.EDA.Text import eda
 from .templates.assignment1.EDA.Tabular import eda as tabular_eda
+from .templates.assignment1.EDA.Image import eda as image_eda
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -164,5 +165,175 @@ def assignment1_tabular(request: Request):
             "outlier_stats": outlier_stats,
             "rel_figs": rel_figs,
             "samples": samples,
+        },
+    )
+
+
+@app.get("/assignment1/image", response_class=HTMLResponse)
+def assignment1_image(request: Request):
+    image_df = image_eda.load_image_statistic()
+    bbox_df = image_eda.load_bbox_statistic()
+    spatial_df = image_eda.load_spatial_distribution()
+    quality_df = image_eda.load_quality_metrics()
+    pixel_df = image_eda.load_pixel_distribution()
+    shape_df = image_eda.load_shape_distribution()
+    mask_df = image_eda.load_mask_statistics()
+    segq_df = image_eda.load_boundary_quality()
+    tsne_df = image_eda.load_tsne_embeddings()
+    sim_df = image_eda.load_similarity_matrix()
+
+    labels_df = image_eda.load_class_labels_txt()
+    classes_df = image_eda.load_classes_txt()
+    split_df = image_eda.load_train_val_test_split_txt()
+
+    overview = image_eda.get_overview(image_df)
+
+    # Part 1
+    fig_split = image_eda.fig_split_bar(image_df).to_html(include_plotlyjs=False, full_html=False)
+    fig_p1_size_scatter = image_eda.fig_p1_size_scatter(image_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p1_file_size_hist = image_eda.fig_p1_file_size_hist(image_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p1_aspect_ratio_hist = image_eda.fig_p1_aspect_ratio_hist(image_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p1_rgb_3d = image_eda.fig_p1_rgb_3d(image_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p1_sharp_vs_contrast = image_eda.fig_p1_sharp_vs_contrast(image_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p1_rgb_box = image_eda.fig_p1_rgb_box(image_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p1_brightness_hist = image_eda.fig_p1_brightness_hist(image_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p1_contrast_hist = image_eda.fig_p1_contrast_hist(image_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+
+    # Part 2
+    fig_p2_bbox_mean_median_bars = image_eda.fig_p2_bbox_mean_median_bars(bbox_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p2_bbox_ar_donut = image_eda.fig_p2_bbox_ar_donut(bbox_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p2_bbox_area_hist = image_eda.fig_p2_bbox_area_hist(bbox_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p2_bbox_wh_scatter = image_eda.fig_p2_bbox_wh_scatter(bbox_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p2_spatial_heatmap = image_eda.fig_p2_spatial_heatmap(spatial_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p2_spatial_dist_hist = image_eda.fig_p2_spatial_dist_hist(spatial_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p2_quality_area_cv_barh = image_eda.fig_p2_quality_area_cv_barh(quality_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p2_quality_coverage_barh = image_eda.fig_p2_quality_coverage_barh(quality_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+
+    # Part 3
+    fig_p3_pixel_donut = image_eda.fig_p3_pixel_donut(pixel_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p3_pixel_mean_std_bars = image_eda.fig_p3_pixel_mean_std_bars(pixel_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p3_shape_metrics_bars = image_eda.fig_p3_shape_metrics_bars(shape_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p3_boundary_thickness_bar = image_eda.fig_p3_boundary_thickness_bar(mask_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p3_boundary_smoothness_bar = image_eda.fig_p3_boundary_smoothness_bar(mask_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p3_boundary_complexity_bar = image_eda.fig_p3_boundary_complexity_bar(mask_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p3_segq_coverage_barh = image_eda.fig_p3_segq_coverage_barh(segq_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p3_segq_coverage_cv_barh = image_eda.fig_p3_segq_coverage_cv_barh(segq_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p3_segq_fg_cv_barh = image_eda.fig_p3_segq_fg_cv_barh(segq_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+
+    # Part 4
+    fig_p4_class_hist = image_eda.fig_p4_class_hist(labels_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p4_top10_classes_barh = image_eda.fig_p4_top10_classes_barh(labels_df, classes_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p4_split_counts_bar = image_eda.fig_p4_split_counts_bar(split_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p4_split_ratio_pie = image_eda.fig_p4_split_ratio_pie(split_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p4_tsne_scatter = image_eda.fig_p4_tsne_scatter(tsne_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p4_umap_scatter = image_eda.fig_p4_umap_scatter(tsne_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p4_pca_cumvar = image_eda.fig_p4_pca_cumvar(tsne_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+    fig_p4_similarity_heatmap = image_eda.fig_p4_similarity_heatmap(sim_df).to_html(
+        include_plotlyjs=False, full_html=False
+    )
+
+    return templates.TemplateResponse(
+        "/assignment1/EDA/Image/index.html",
+        {
+            "request": request,
+            "overview": overview,
+            "fig_split": fig_split,
+            "fig_p1_size_scatter": fig_p1_size_scatter,
+            "fig_p1_file_size_hist": fig_p1_file_size_hist,
+            "fig_p1_aspect_ratio_hist": fig_p1_aspect_ratio_hist,
+            "fig_p1_rgb_3d": fig_p1_rgb_3d,
+            "fig_p1_sharp_vs_contrast": fig_p1_sharp_vs_contrast,
+            "fig_p1_rgb_box": fig_p1_rgb_box,
+            "fig_p1_brightness_hist": fig_p1_brightness_hist,
+            "fig_p1_contrast_hist": fig_p1_contrast_hist,
+            "fig_p2_bbox_mean_median_bars": fig_p2_bbox_mean_median_bars,
+            "fig_p2_bbox_ar_donut": fig_p2_bbox_ar_donut,
+            "fig_p2_bbox_area_hist": fig_p2_bbox_area_hist,
+            "fig_p2_bbox_wh_scatter": fig_p2_bbox_wh_scatter,
+            "fig_p2_spatial_heatmap": fig_p2_spatial_heatmap,
+            "fig_p2_spatial_dist_hist": fig_p2_spatial_dist_hist,
+            "fig_p2_quality_area_cv_barh": fig_p2_quality_area_cv_barh,
+            "fig_p2_quality_coverage_barh": fig_p2_quality_coverage_barh,
+            "fig_p3_pixel_donut": fig_p3_pixel_donut,
+            "fig_p3_pixel_mean_std_bars": fig_p3_pixel_mean_std_bars,
+            "fig_p3_shape_metrics_bars": fig_p3_shape_metrics_bars,
+            "fig_p3_boundary_thickness_bar": fig_p3_boundary_thickness_bar,
+            "fig_p3_boundary_smoothness_bar": fig_p3_boundary_smoothness_bar,
+            "fig_p3_boundary_complexity_bar": fig_p3_boundary_complexity_bar,
+            "fig_p3_segq_coverage_barh": fig_p3_segq_coverage_barh,
+            "fig_p3_segq_coverage_cv_barh": fig_p3_segq_coverage_cv_barh,
+            "fig_p3_segq_fg_cv_barh": fig_p3_segq_fg_cv_barh,
+            "fig_p4_class_hist": fig_p4_class_hist,
+            "fig_p4_top10_classes_barh": fig_p4_top10_classes_barh,
+            "fig_p4_split_counts_bar": fig_p4_split_counts_bar,
+            "fig_p4_split_ratio_pie": fig_p4_split_ratio_pie,
+            "fig_p4_tsne_scatter": fig_p4_tsne_scatter,
+            "fig_p4_umap_scatter": fig_p4_umap_scatter,
+            "fig_p4_pca_cumvar": fig_p4_pca_cumvar,
+            "fig_p4_similarity_heatmap": fig_p4_similarity_heatmap,
         },
     )

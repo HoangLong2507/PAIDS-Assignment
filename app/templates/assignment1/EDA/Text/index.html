@@ -70,7 +70,7 @@
           <summary>Missing values &amp; duplicate details:</summary>
           <div class="details-body">
             <p>
-              <strong>Duplicates (current df):</strong> {{ overview.duplicates
+              <strong>Duplicates:</strong> {{ overview.duplicates
               }}
             </p>
             <h4>Missing values</h4>
@@ -250,6 +250,28 @@
           overlap in terms of vocabulary and common terms.
         </p>
         <div class="plot">{{ sim_fig | safe }}</div>
+      </section>
+      
+      <section class="card" id="key-insights">
+        <h2>Key Insights</h3>
+
+        <div style="margin-top: 8px">
+          <h3>Dataset Characteristics</h3>
+          <ul>
+            <li>Slightly Imbalanced Dataset: Categories are slightly imbalanced (Not spam: ~68.7%, Spam: ~31.3%).</li>
+            <li>Email Length: Average 137 words and 843 characters per email (all raw words included).</li>
+            <li>Vocabulary Richness: Spam emails have a relatively smaller vocabulary (963 unique words) compared to Not Spam emails (1861 unique words).</li>
+            <li>Stop Words Density: Stop words make up a significant portion of the text corpus at 40.8% (4,635 out of 11,356 total words).</li>
+          </ul>
+
+          <h3>Data Processing</h3>
+          <ul>
+            <li>Raw Statistics: Word and character counts include ALL words, including stop words like "the", "to", "and", "you", "your".</li>
+            <li>Vocabulary Analysis: Word frequency and unique vocabulary stats are calculated AFTER removing common stop words.</li>
+            <li>Distinctive Vocabulary: Spam features promotional language (click, win, free, today, just), whereas Not Spam features professional or administrative language (email, company, account, service, privacy).</li>
+            <li>Why TF-IDF & Mixed Approach: Length stats provide real email size, while TF-IDF metrics highlight terms that are contextually unique to Spam or Ham instead of generic high-frequency terms.</li>
+          </ul>
+        </div>
       </section>
     </main>
   </body>

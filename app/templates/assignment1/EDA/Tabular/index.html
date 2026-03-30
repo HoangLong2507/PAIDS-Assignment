@@ -136,9 +136,9 @@
         {% for feature, payload in cat_payload.items() %}
         <div class="card" style="margin: 12px 0">
           <h3 style="margin-bottom: 6px">{{ feature.replace('_',' ').title() }}</h3>
-          <div class="grid-2">
+          <div>
             <div class="plot">{{ payload.fig | safe }}</div>
-            <div>
+            <!-- <div>
               <div class="metric">
                 <div class="metric-label">Missing</div>
                 <div class="metric-value">
@@ -165,7 +165,7 @@
                   {% endfor %}
                 </tbody>
               </table>
-            </div>
+            </div> -->
           </div>
         </div>
         {% endfor %}
@@ -349,6 +349,51 @@
           <li><strong>Ratings:</strong> TV-MA is a frequent rating, targeted toward mature audiences.</li>
           <li><strong>Production:</strong> The USA is a leading country in content production.</li>
         </ol>
+
+        <div style="margin-top:12px">
+          <h4 style="margin:6px 0">1. Content Strategy &amp; Distribution</h4>
+          <ul>
+            <li><strong>Movies Dominate:</strong> Netflix’s catalog is heavily skewed toward Movies, which make up nearly 70% of the platform's offerings, compared to TV Shows at 30%.</li>
+            <li><strong>Top Producing Nations:</strong> The United States is the undisputed leader in content volume, followed by India and the United Kingdom.</li>
+            <li><strong>Regional Content Preferences:</strong> While the US produces a balanced mix, countries like India and Hong Kong are overwhelmingly focused on Movies (&gt;90%). Conversely, countries like South Korea and Japan show a much stronger emphasis on TV Shows compared to the global average.</li>
+          </ul>
+
+          <h4 style="margin:6px 0">2. Temporal &amp; Release Trends</h4>
+          <ul>
+            <li><strong>Recent Growth Spurt:</strong> The vast majority of the content currently available was released in the last decade (post-2010), reflecting Netflix's aggressive acquisition and original content production strategy in recent years.</li>
+            <li><strong>Outliers in Antiquity:</strong> While the focus is heavily modern, there are notable outliers dating back to the 1920s through the 1970s, indicating a curated but small selection of classic cinema.</li>
+          </ul>
+
+          <h4 style="margin:6px 0">3. Audience Targeting (Ratings)</h4>
+          <ul>
+            <li><strong>Mature Audience Focus:</strong> The most frequent content ratings are TV-MA and TV-14, indicating that Netflix strongly targets adult and mature teen demographics rather than primarily focusing on children’s or family-friendly content.</li>
+          </ul>
+
+          <h4 style="margin:6px 0">4. Data Quality &amp; Imbalance</h4>
+          <ul>
+            <li><strong>Missing Information:</strong> Fields like <code>director</code>, <code>cast</code>, and <code>country</code> contain meaningful proportions of missing data. Any future ML models or recommendation systems relying on these fields must incorporate robust imputation strategies.</li>
+            <li><strong>Dataset Balance:</strong> The 70/30 split between Movies and TV Shows presents a mild to moderate class imbalance. If predictive modeling is the next step, techniques like stratified sampling or class weighting may be necessary.</li>
+          </ul>
+
+          <h4 style="margin:6px 0">Dataset characteristics (summary)</h4>
+          <ul>
+            <li>Dataset contains <strong>8,807 samples</strong> with <strong>12 features</strong>.</li>
+            <li><strong>Imbalanced dataset:</strong> Movie (69.6%) vs TV Show (30.4%) - ratio ~2.3:1.</li>
+            <li><strong>Found missing values in 6 columns:</strong>
+              <ul>
+                <li><code>director</code>: 2,634 missing (29.91%)</li>
+                <li><code>country</code>: 831 missing (9.44%)</li>
+                <li><code>cast</code>: 825 missing (9.37%)</li>
+                <li><code>date_added</code>: 10 missing (0.11%)</li>
+                <li><code>rating</code>: 4 missing (0.05%)</li>
+                <li><code>duration</code>: 3 missing (0.03%)</li>
+              </ul>
+            </li>
+            <li>Suggestion: Use mode/median imputation for columns with &lt;1% missing, and NLP/constant techniques for <code>director</code> and <code>cast</code>.</li>
+            <li>Detected <strong>719 outliers</strong> across <code>release_year</code> (8.16%). Suggest investigating these outliers — consider clipping or categorization for classic movies.</li>
+            <li>No high numerical correlations found — features are primarily categorical and relatively independent.</li>
+          </ul>
+        </div>
       </section>
     </main>
   </body>

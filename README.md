@@ -4,8 +4,8 @@
 This repository contains a small **FastAPI** web app that presents **EDA (Exploratory Data Analysis)** results for:
 
 - **Tabular dataset**: `netflix_titles.csv` (Netflix titles metadata)
-- **Text dataset**: `email_spam.csv` (spam vs. ham emails)
-
+ - **Image dataset**: `image_statistic.csv` + related CSVs (image / bbox / mask / quality stats)
+- 
 The UI is rendered with **Jinja2 templates** and charts are generated with **Plotly**.
 
 ## What’s inside
@@ -57,6 +57,22 @@ Create or export the tabular dataset `netflix_titles.csv` in this location:  `ap
 
 Create or export the text dataset `email_spam.csv` in this location: `app/templates/assignment1/EDA/Text/email_spam.csv`
 
+### Image (image statistics)
+
+Place the image-related CSV files in: `app/templates/assignment1/EDA/Image/csv/`.
+Common files used by the Image EDA include:
+
+- `image_statistic.csv` (primary image metadata)
+- `bbox_statistic.csv` (bounding box records)
+- `mask_statistics.csv`, `quality_metrics.csv`, `pixel_distribution.csv`, `shape_distribution.csv`
+- `segmentation_boundary_quality_metric.csv`, `spatial_distribution_analytics.csv`, `tsne_embeddings.csv`, `similarity_matrix.csv`
+
+Optional directories read by the Image EDA template:
+
+- `app/templates/assignment1/EDA/Image/parts/` — files representing part locations
+- `app/templates/assignment1/EDA/Image/attributes/` — binary attribute files
+ - `app/templates/assignment1/EDA/Image/eda.py` — image EDA logic (CUB / image statistics)
+ 
 ## Notes
 
 - Plotly is rendered without bundling Plotly.js in every figure (`include_plotlyjs=False`). The page template is expected to include Plotly.js once globally.

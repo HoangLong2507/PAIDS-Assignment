@@ -69,10 +69,20 @@ def _normalize_type(s: str) -> str:
 
 @lru_cache(maxsize=2)
 def load_df() -> pd.DataFrame:
-    df = pd.read_csv(DATA_PATH)
+    df_raw = pd.read_csv(DATA_PATH)
+
+    # record duplicates count from the raw data before dropping them
+    original_duplicates = int(df_raw.duplicated().sum())
 
     # basic cleaning (match notebook intent)
-    df = df.drop_duplicates().reset_index(drop=True)
+    df = df_raw.drop_duplicates().reset_index(drop=True)
+    # store the original duplicates count so overview can report it
+    try:
+        df.attrs["original_duplicates"] = original_duplicates
+    except Exception:
+        # if pandas version doesn't support attrs or assignment fails,
+        # fall back silently and let get_overview compute duplicates from df
+        pass
     if "text" in df.columns:
         df["text"] = df["text"].fillna("")
 
@@ -86,7 +96,8 @@ def load_df() -> pd.DataFrame:
 
 
 def get_overview(df: pd.DataFrame) -> DatasetOverview:
-    duplicates = int(df.duplicated().sum())
+    # Prefer the original duplicates count (before cleaning) when available.
+    duplicates = int(df.attrs.get("original_duplicates", int(df.duplicated().sum())))
     missing = {c: int(df[c].isnull().sum()) for c in df.columns}
 
     return DatasetOverview(
