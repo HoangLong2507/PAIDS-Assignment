@@ -8,6 +8,12 @@
     <!-- Plotly JS via CDN (keep consistent with Text page) -->
     <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/static/assignment1.styles.css" />
   </head>
 
@@ -22,16 +28,11 @@
         </a>
 
         <nav class="toc">
-          <a href="#overview">Overview</a>
-          <a href="#missing">Missing</a>
-          <a href="#numerical">Numerical</a>
-          <a href="#categorical">Categorical</a>
-          <a href="#target">Target</a>
-          <a href="#corr">Correlation</a>
-          <a href="#outliers">Outliers</a>
-          <a href="#relations">Relationships</a>
-          <a href="#samples">Samples</a>
-          <a href="#insights">Insights</a>
+          <a href="#part-1">Part 1</a>
+          <a href="#part-2">Part 2</a>
+          <a href="#part-3">Part 3</a>
+          <a href="#part-4">Part 4</a>
+          <a href="#part-5">Part 5</a>
         </nav>
       </div>
     </header>
@@ -46,11 +47,15 @@
         >
       </div>
 
+      <section class="card part-card" id="part-1">
+        <h2 class="part-title">Part 1: Data Understanding</h2>
+        <p class="part-subtitle">Initial overview and data quality check</p>
+      </section>
+
       <section class="card" id="overview">
         <h3>📊 1. Dataset Overview</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
-          First look at dataset structure: number of samples, number of
-          features, and feature types.
+          In this section, we take a first look at the structure of the dataset. The goal is to determine the number of samples (rows), the number of features (columns), and classify them into numerical or categorical data. This helps us understand the scale and complexity of the data before diving into details.
         </h4>
 
         <div class="grid-4">
@@ -76,7 +81,7 @@
       <section class="card" id="missing">
         <h3>🔍 2. Missing Values Analysis</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
-          Calculate missing counts and percentages per column.
+          Missing data is a common issue that can bias analysis results. Here, we will calculate the percentage of missing values for each column and visualize them. This helps in deciding whether to drop missing rows or perform data imputation.
         </h4>
 
         <div class="grid-2">
@@ -104,10 +109,15 @@
         </div>
       </section>
 
+      <section class="card part-card" id="part-2">
+        <h2 class="part-title">Part 2: Feature Distribution</h2>
+        <p class="part-subtitle">Analyzing numerical and categorical attributes</p>
+      </section>
+
       <section class="card" id="numerical">
         <h3>📈 3. Numerical Features Distribution</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
-          Analyze quantitative variables like release year.
+          We analyze quantitative variables such as the release year. By using histograms and statistical metrics like Mean, Median, and Standard Deviation, we can observe the growth trends of Netflix content over time.
         </h4>
 
         <div class="plot">{{ fig_release_year | safe }}</div>
@@ -143,7 +153,7 @@
       <section class="card" id="categorical">
         <h3>📊 4. Categorical Features Distribution</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
-          Top 15 categories for each categorical feature.
+          This section focuses on qualitative information such as Country, Director, Cast, and Content Rating. We extract the most frequent values (Top 15) to better understand the origins and the target audience Netflix is catering to.
         </h4>
 
         {% for feature, payload in cat_payload.items() %}
@@ -186,10 +196,15 @@
         {% endfor %}
       </section>
 
+      <section class="card part-card" id="part-3">
+        <h2 class="part-title">Part 3: Statistical Analysis</h2>
+        <p class="part-subtitle">Target variables, correlations, and outliers</p>
+      </section>
+
       <section class="card" id="target">
         <h3>🎯 5. Target Variable Distribution</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
-          Content Type split: Movies vs TV Shows.
+          The target variable here is 'Content Type', divided into Movies and TV Shows. A pie chart will help us clearly see the proportion between these two types, revealing Netflix's core content strategy.
         </h4>
 
         <div class="grid-2">
@@ -220,7 +235,7 @@
       <section class="card" id="corr">
         <h3>🔗 6. Correlation Analysis</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
-          Correlation among numerical features (if available).
+          We examine the relationship between numerical variables. If two variables are highly correlated, they might provide redundant information. Since this dataset is primarily text-based, we check for any significant numerical connections.
         </h4>
 
         {% if fig_corr %}
@@ -261,7 +276,7 @@
       <section class="card" id="outliers">
         <h3>📦 7. Outlier Detection (IQR)</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
-          Identify outliers for release year using a box plot and IQR.
+          Using the IQR (Interquartile Range) method and Box Plots, we identify abnormal values. For example, movies that are significantly older than the majority of modern content. This helps determine if the data contains noise or special cases that require attention.
         </h4>
 
         <div class="grid-2">
@@ -302,10 +317,15 @@
         </div>
       </section>
 
+      <section class="card part-card" id="part-4">
+        <h2 class="part-title">Part 4: Relationships & Samples</h2>
+        <p class="part-subtitle">Multivariate analysis and raw data inspection</p>
+      </section>
+
       <section class="card" id="relations">
         <h3>🎯 8. Relationship between Target and Other Features</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
-          Stacked percent bars: Movie vs TV Show across top categories.
+          This is a multivariate analysis step. We examine how the content type (Movie vs TV Show) varies across different countries, ratings, or directors. This helps identify the characteristic traits of each content category.
         </h4>
 
         {% for feature, payload in rel_figs.items() %}
@@ -408,6 +428,11 @@
             {% endif %}
           </div>
         </div>
+      </section>
+
+      <section class="card part-card" id="part-5">
+        <h2 class="part-title">Part 5: Final Insights</h2>
+        <p class="part-subtitle">Summary of key findings and recommendations</p>
       </section>
 
       <section class="card" id="insights">
