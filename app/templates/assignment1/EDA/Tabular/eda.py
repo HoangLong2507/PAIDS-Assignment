@@ -41,8 +41,6 @@ class DatasetOverview:
 def load_df() -> pd.DataFrame:
     df = pd.read_csv(DATA_PATH)
 
-    # Match notebook behavior (kaggle dataset has same columns).
-    # Parse date_added for optional analysis; keep original too.
     if "date_added" in df.columns:
         df["date_added_parsed"] = pd.to_datetime(df["date_added"], errors="coerce")
 
@@ -50,10 +48,13 @@ def load_df() -> pd.DataFrame:
 
 
 def get_overview(df: pd.DataFrame) -> DatasetOverview:
+    cols_to_count = [c for c in df.columns if c != "date_added_parsed"]
+    df_for_count = df[cols_to_count]
+
     total_samples = int(len(df))
-    total_features = int(len(df.columns))
-    numerical_features = int(len(df.select_dtypes(include=["number"]).columns))
-    categorical_features = int(len(df.select_dtypes(exclude=["number"]).columns))
+    total_features = int(len(df_for_count.columns))
+    numerical_features = int(len(df_for_count.select_dtypes(include=["number"]).columns))
+    categorical_features = int(len(df_for_count.select_dtypes(exclude=["number"]).columns))
 
     return DatasetOverview(
         total_samples=total_samples,
@@ -114,7 +115,6 @@ def fig_release_year_distribution(df: pd.DataFrame) -> Tuple[go.Figure, Dict[str
         for i in range(len(bin_edges) - 1)
     ]
 
-    # notebook reverses display order
     counts = counts[::-1]
     bin_labels = bin_labels[::-1]
 
@@ -453,12 +453,10 @@ def fig_target_relationships(df: pd.DataFrame) -> Dict[str, Tuple[go.Figure, Dic
             margin=dict(l=40, r=20, t=80, b=140),
         )
 
-        # Build a compact table showing the top-5 categories by the sort_col
         top_n = 5
         try:
             top_df = crosstab.nlargest(top_n, sort_col)
         except Exception:
-            # Fallback: take first top_n rows if nlargest fails
             top_df = crosstab.head(top_n)
 
         top_rows: List[Dict[str, object]] = []
