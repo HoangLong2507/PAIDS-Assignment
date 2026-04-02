@@ -1,0 +1,11 @@
+.venv/
+.git/
+.github/
+.gitignore
+.DS_Store
+__pycache__/
+*.pyc
+*.py[cod]
+memory-bank/
+README.md
+fly.toml
