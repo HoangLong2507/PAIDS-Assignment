@@ -44,62 +44,87 @@ def assignment1_text(request: Request):
     df = eda.load_df()
 
     overview = eda.get_overview(df)
+    per_rating_stats = eda.per_rating_length_stats(df).to_dict(orient="records")
 
-    fig_bar = eda.fig_category_bar(df).to_html(include_plotlyjs=False, full_html=False)
-    fig_pie = eda.fig_category_pie(df).to_html(include_plotlyjs=False, full_html=False)
-    fig_lengths = eda.fig_length_distributions(df).to_html(
-        include_plotlyjs=False, full_html=False
-    )
+    rating_table = eda.rating_distribution(df).to_dict(orient="records")
+    fig_rating_pie = eda.fig_rating_pie(df).to_html(include_plotlyjs=False, full_html=False)
 
     fig_stop, total_words, total_stop = eda.fig_stopwords_raw(df)
     fig_stop_html = fig_stop.to_html(include_plotlyjs=False, full_html=False)
 
-    cleaned_text = eda.clean_text_series(df)
+    cleaned = eda.clean_text_series(df)
+    vocab_before, vocab_after = eda.vocab_sizes(df, cleaned)
 
-    stats_df = eda.vocab_richness(df, cleaned_text)
+    stats_df = eda.vocab_richness(df, cleaned)
     vocab_table = stats_df.to_dict(orient="records")
-    fig_vocab = eda.fig_vocab_richness(stats_df).to_html(
-        include_plotlyjs=False, full_html=False
-    )
+    fig_vocab = eda.fig_vocab_richness(stats_df).to_html(include_plotlyjs=False, full_html=False)
 
-    top50_figs = {
-        k: v.to_html(include_plotlyjs=False, full_html=False)
-        for k, v in eda.fig_top50_words_by_type(df, cleaned_text).items()
+    fig_top50 = {
+        int(k): v.to_html(include_plotlyjs=False, full_html=False)
+        for k, v in eda.fig_top50_words_by_rating(df, cleaned).items()
+    }
+    fig_tfidf = {
+        int(k): v.to_html(include_plotlyjs=False, full_html=False)
+        for k, v in eda.fig_tfidf_top_terms(df, cleaned).items()
+    }
+    fig_bigrams = {
+        int(k): v.to_html(include_plotlyjs=False, full_html=False)
+        for k, v in eda.fig_bigrams(df, cleaned).items()
     }
 
-    tfidf_figs = {
-        k: v.to_html(include_plotlyjs=False, full_html=False)
-        for k, v in eda.fig_tfidf_top_terms(df, cleaned_text).items()
-    }
-
-    bigram_figs = {
-        k: v.to_html(include_plotlyjs=False, full_html=False)
-        for k, v in eda.fig_bigrams(df, cleaned_text).items()
-    }
-
-    sim_fig, categories, sim = eda.fig_category_similarity(df)
+    sim_fig, sim_labels, sim_matrix = eda.fig_rating_similarity(df)
     sim_html = sim_fig.to_html(include_plotlyjs=False, full_html=False)
+
+    # Part 4 text (from Tripadvisor_Text_EDA.ipynb) as simple HTML.
+    insights_html = """
+<h3>1. Dataset Characteristics</h3>
+<ul>
+  <li><b>Rating Distribution:</b> moderately imbalanced (Rating 5★ leads at 44.19%.)</li>
+  <li><b>Review Length:</b> Overall average of 104.38 words and average of 724.90 characters per review (raw, all words included). Negative reviews are notably longer with average 126.60 words (867 characters) for 2★ reviews, and 5★ reviews at only 93.96 words (661 characters). Frustrated guests write more; satisfied guests write less.</li>
+  <li><b>Corpus Size:</b> 2,138,765 total raw words across all 20,491 reviews</li>
+  <li><b>Stop Words Density:</b> Only 45,273 stop words detected (2.1% of corpus), which far below typical English prose (30–40%).</li>
+  <li><b>Vocabulary Size:</b> 102,008 tokens before cleaning → 75,048 after removing stop words &amp; non-alpha (26.4% reduction)</li>
+  <li><b>Data Quality:</b> 0 missing values, 0 duplicate rows, which is an exceptionally clean dataset</li>
+</ul>
+
+<h3>2. Vocabulary &amp; Language Patterns</h3>
+<ul>
+  <li><b>Vocabulary Richness by Rating (after cleaning):</b> 5★ has ~5 times more total words than 1★ (reflects class imbalance), and also ~3 times more unique vocabulary, i.e., positive reviews have richer, more varied language</li>
+</ul>
+
+<h3>3. Data Processing</h3>
+<ul>
+  <li><b>Raw Stats:</b> Word/character counts include ALL words (not, no, nothing, none, cant, etc.)</li>
+  <li><b>Vocabulary Stats:</b> Word frequency, TF-IDF, and bigram analyses computed AFTER removing stop words, punctuation, numbers</li>
+  <li><b>Stop Word Anomaly:</b> 2.1% stop word rate (vs typical 30–40%) suggests text is already preprocessed or written in a telegraphic/informal style common to review platforms — affects absolute stop word counts but not relative vocabulary analysis</li>
+  <li><b>Why TF-IDF + Bigrams:</b> Top raw frequencies (hotel, room) are identical across all ratings, which is meaningless for discrimination. TF-IDF surfaces weighted terms (nt, staff) while Bigrams restore context (&quot;credit card&quot; vs &quot;great location&quot;)</li>
+</ul>
+""".strip()
 
     return templates.TemplateResponse(
         "/assignment1/EDA/Text/index.html",
         {
             "request": request,
             "overview": overview,
-            "fig_bar": fig_bar,
-            "fig_pie": fig_pie,
-            "fig_lengths": fig_lengths,
-            "fig_stop": fig_stop_html,
+            "per_rating_stats": per_rating_stats,
+            "rating_table": rating_table,
+            "fig_rating_pie": fig_rating_pie,
+            "fig_stopwords": fig_stop_html,
             "total_words": total_words,
             "total_stop": total_stop,
             "stop_pct": (total_stop / total_words * 100) if total_words else 0.0,
+            "vocab_before": vocab_before,
+            "vocab_after": vocab_after,
+            "vocab_reduction_pct": (1 - vocab_after / vocab_before) * 100 if vocab_before else 0.0,
             "vocab_table": vocab_table,
-            "fig_vocab": fig_vocab,
-            "top50_figs": top50_figs,
-            "tfidf_figs": tfidf_figs,
-            "bigram_figs": bigram_figs,
-            "sim_fig": sim_html,
-            "categories": categories,
-            "sim": sim,
+            "fig_vocab_richness": fig_vocab,
+            "fig_top50": fig_top50,
+            "fig_tfidf": fig_tfidf,
+            "fig_bigrams": fig_bigrams,
+            "fig_similarity": sim_html,
+            "sim_labels": sim_labels,
+            "sim_matrix": sim_matrix,
+            "insights_html": insights_html,
         },
     )
 

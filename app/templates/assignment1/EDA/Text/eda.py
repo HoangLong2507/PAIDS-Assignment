@@ -9,281 +9,202 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, CountVectorizer, TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
 def _resolve_data_path() -> Path:
-    """Resolve `email_spam.csv` robustly.
+    """Resolve `tripadvisor_hotel_reviews.csv` robustly.
 
-    Preferred location is next to this module:
-    `app/templates/assignment1/EDA/Text/email_spam.csv`.
-
-    Fallback keeps compatibility with earlier assumptions where the CSV lived in
-    the repository root.
+    This page is rendered from a FastAPI app, so we avoid cwd-based paths.
     """
 
     here = Path(__file__).resolve().parent
     candidates = [
-        here / "email_spam.csv",
-        # repository root (..../Assignment/email_spam.csv)
-        Path(__file__).resolve().parents[5] / "email_spam.csv",
+        here / "tripadvisor_hotel_reviews.csv",
+        Path(__file__).resolve().parents[5] / "tripadvisor_hotel_reviews.csv",
     ]
     for p in candidates:
         if p.exists():
             return p
-    # If nothing exists, return the "expected" local path so the error is informative.
     return candidates[0]
 
 
 DATA_PATH = _resolve_data_path()
 
 
-COLORS = {
-    "spam": "#ef553b",
-    "ham": "#636efa",
-    "not spam": "#636efa",
+RATINGS: List[int] = [1, 2, 3, 4, 5]
+COLORS_RATING: Dict[int, str] = {
+    1: "#d62728",
+    2: "#ff7f0e",
+    3: "#bcbd22",
+    4: "#2ca02c",
+    5: "#1f77b4",
 }
 
 
 @dataclass(frozen=True)
 class DatasetOverview:
-    total_emails: int
-    categories: List[str]
-    missing_values: Dict[str, int]
+    total_reviews: int
+    total_features: int
+    rating_min: int
+    rating_max: int
+    missing_review: int
+    missing_rating: int
     duplicates: int
     avg_words: float
     avg_chars: float
 
 
-def _normalize_type(s: str) -> str:
-    s = str(s).strip().lower()
-    # normalize "not spam" -> "ham" for plotting colors/labels consistency
-    if s in {"not spam", "not_spam", "notspam", "ham"}:
-        return "ham" if s != "not spam" else "not spam"
-    if s == "spam":
-        return "spam"
-    return s
-
-
 @lru_cache(maxsize=2)
 def load_df() -> pd.DataFrame:
-    df_raw = pd.read_csv(DATA_PATH)
+    df = pd.read_csv(DATA_PATH)
 
-    # record duplicates count from the raw data before dropping them
-    original_duplicates = int(df_raw.duplicated().sum())
+    # normalize columns (dataset uses Review,Rating)
+    if "Review" not in df.columns or "Rating" not in df.columns:
+        raise ValueError("Expected columns: Review, Rating")
 
-    # basic cleaning (match notebook intent)
-    df = df_raw.drop_duplicates().reset_index(drop=True)
-    # store the original duplicates count so overview can report it
-    try:
-        df.attrs["original_duplicates"] = original_duplicates
-    except Exception:
-        # if pandas version doesn't support attrs or assignment fails,
-        # fall back silently and let get_overview compute duplicates from df
-        pass
-    if "text" in df.columns:
-        df["text"] = df["text"].fillna("")
+    # drop duplicates and fill missing
+    df = df.drop_duplicates().reset_index(drop=True)
+    df["Review"] = df["Review"].fillna("")
 
-    df["type"] = df["type"].astype(str)
-
-    # Derived stats used in multiple charts
-    df["word_count"] = df["text"].apply(lambda x: len(str(x).split()))
-    df["char_count"] = df["text"].apply(lambda x: len(str(x)))
-
+    # basic lengths used throughout
+    df["word_count"] = df["Review"].astype(str).apply(lambda x: len(x.split()))
+    df["char_count"] = df["Review"].astype(str).apply(len)
     return df
 
 
 def get_overview(df: pd.DataFrame) -> DatasetOverview:
-    # Prefer the original duplicates count (before cleaning) when available.
-    duplicates = int(df.attrs.get("original_duplicates", int(df.duplicated().sum())))
-    missing = {c: int(df[c].isnull().sum()) for c in df.columns}
+    raw = pd.read_csv(DATA_PATH)
+    duplicates = int(raw.duplicated().sum())
 
     return DatasetOverview(
-        total_emails=int(len(df)),
-        categories=len(sorted(df["type"].unique().tolist())),
-        missing_values=missing,
+        total_reviews=int(len(df)),
+        total_features=int(len(df.columns)),
+        rating_min=int(df["Rating"].min()),
+        rating_max=int(df["Rating"].max()),
+        missing_review=int(raw["Review"].isnull().sum()) if "Review" in raw.columns else 0,
+        missing_rating=int(raw["Rating"].isnull().sum()) if "Rating" in raw.columns else 0,
         duplicates=duplicates,
         avg_words=float(df["word_count"].mean()),
         avg_chars=float(df["char_count"].mean()),
     )
 
 
-def fig_category_bar(df: pd.DataFrame) -> go.Figure:
-    category_counts = df["type"].value_counts()
-    percentages = (category_counts / len(df) * 100).round(2)
-
-    fig = go.Figure(
-        data=[
-            go.Bar(
-                x=category_counts.index,
-                y=category_counts.values,
-                text=[
-                    f"{val} ({pct}%)"
-                    for val, pct in zip(category_counts.values, percentages.values)
-                ],
-                textposition="auto",
-                marker_color=[
-                    COLORS.get(_normalize_type(t), "#333") for t in category_counts.index
-                ],
-            )
-        ]
+def per_rating_length_stats(df: pd.DataFrame) -> pd.DataFrame:
+    return (
+        df.groupby("Rating")[["word_count", "char_count"]]
+        .mean()
+        .reindex(RATINGS)
+        .round(2)
+        .reset_index()
     )
 
-    fig.update_layout(
-        title="Category Distribution (Spam vs. Ham)",
-        xaxis_title="Email Type",
-        yaxis_title="Count",
-        template="plotly_white",
-        height=420,
-        margin=dict(l=40, r=20, t=60, b=40),
-    )
-    return fig
+
+def rating_distribution(df: pd.DataFrame) -> pd.DataFrame:
+    vc = df["Rating"].value_counts().reindex(RATINGS).fillna(0).astype(int)
+    pct = (vc / len(df) * 100).round(2)
+    out = pd.DataFrame({"Rating": vc.index, "Count": vc.values, "Percent": pct.values})
+    return out
 
 
-def fig_category_pie(df: pd.DataFrame) -> go.Figure:
-    category_counts = df["type"].value_counts()
-
+def fig_rating_pie(df: pd.DataFrame) -> go.Figure:
+    dist = rating_distribution(df)
     fig = go.Figure(
         data=[
             go.Pie(
-                labels=category_counts.index,
-                values=category_counts.values,
-                hole=0.5,
-                marker=dict(colors=[
-                    "#667eea",
-                    "#764ba2",
-                    "#f093fb",
-                    "#4facfe",
-                    "#43e97b",
-                ]),
+                labels=[f"{int(r)}★" for r in dist["Rating"].tolist()],
+                values=dist["Count"].tolist(),
+                hole=0.3,
+                marker=dict(colors=[COLORS_RATING[int(r)] for r in dist["Rating"].tolist()]),
+                textinfo="label+percent",
+                textfont_size=13,
             )
         ]
     )
     fig.update_layout(
-        title="Category Distribution (Spam vs. Ham)",
+        title="Rating Distribution — Proportion (1★ through 5★)",
         showlegend=True,
-        height=420,
-        margin=dict(l=40, r=20, t=60, b=40),
-    )
-    return fig
-
-
-def fig_length_distributions(df: pd.DataFrame) -> go.Figure:
-    fig = make_subplots(
-        rows=1,
-        cols=2,
-        subplot_titles=("Word Count Distribution", "Character Count Distribution"),
-    )
-
-    types = df["type"].unique()
-    for t in types:
-        subset = df[df["type"] == t]
-        color = COLORS.get(_normalize_type(t), "#333333")
-
-        fig.add_trace(
-            go.Histogram(
-                x=subset["word_count"],
-                name=f"{t} Words",
-                marker_color=color,
-                opacity=0.7,
-                nbinsx=50,
-            ),
-            row=1,
-            col=1,
-        )
-
-        fig.add_trace(
-            go.Histogram(
-                x=subset["char_count"],
-                name=f"{t} Chars",
-                marker_color=color,
-                opacity=0.7,
-                nbinsx=50,
-            ),
-            row=1,
-            col=2,
-        )
-
-    fig.update_layout(
-        barmode="overlay",
-        title_text="Length Distributions by Category",
+        width=600,
+        height=450,
         template="plotly_white",
-        height=520,
-        margin=dict(l=40, r=20, t=60, b=40),
     )
-
-    max_words = float(df["word_count"].quantile(0.95))
-    max_chars = float(df["char_count"].quantile(0.95))
-    fig.update_xaxes(range=[0, max_words], row=1, col=1)
-    fig.update_xaxes(range=[0, max_chars], row=1, col=2)
-
     return fig
 
 
 def fig_stopwords_raw(df: pd.DataFrame) -> Tuple[go.Figure, int, int]:
     stop_words = set(ENGLISH_STOP_WORDS)
-    all_words_raw = " ".join(df["text"].astype(str)).lower().split()
+    words = " ".join(df["Review"].astype(str)).lower().split()
+    total_words = int(len(words))
+    stop_counts: Dict[str, int] = {}
+    for w in words:
+        if w in stop_words:
+            stop_counts[w] = stop_counts.get(w, 0) + 1
+    top = sorted(stop_counts.items(), key=lambda x: x[1], reverse=True)[:20]
 
-    from collections import Counter
-
-    stop_word_counts = Counter([w for w in all_words_raw if w in stop_words])
-    top_stopwords = stop_word_counts.most_common(20)
-
-    words, counts = zip(*top_stopwords) if top_stopwords else ([], [])
+    if top:
+        x, y = zip(*top)
+        x = list(x)
+        y = list(y)
+    else:
+        x, y = [], []
 
     fig = go.Figure(
         data=[
             go.Bar(
-                x=list(words),
-                y=list(counts),
+                x=x,
+                y=y,
                 marker_color="#9467bd",
-                text=list(counts),
+                text=y,
                 textposition="outside",
             )
         ]
     )
     fig.update_layout(
-        title="Top 20 Stop Words in Raw Data",
+        title="Top 20 Stop Words in Raw Hotel Reviews",
         xaxis_title="Stop Words",
         yaxis_title="Frequency",
         template="plotly_white",
-        height=420,
-        margin=dict(l=40, r=20, t=60, b=40),
+        height=500,
     )
 
-    total_words = len(all_words_raw)
-    total_stopwords_found = int(sum(stop_word_counts.values()))
-    return fig, total_words, total_stopwords_found
+    total_stop = int(sum(stop_counts.values()))
+    return fig, total_words, total_stop
 
 
 def clean_text_series(df: pd.DataFrame) -> pd.Series:
     stop_words = set(ENGLISH_STOP_WORDS)
-
+    # close to notebook pipeline: lowercase, remove punctuation, keep alpha tokens, remove stopwords
     import string as _string
 
     translator = str.maketrans("", "", _string.punctuation)
 
-    def clean_text(text: str) -> str:
-        text = str(text).lower()
-        text = text.translate(translator)
-        tokens = text.split()
-        cleaned = [w for w in tokens if w not in stop_words and w.isalpha()]
-        return " ".join(cleaned)
+    def _clean(text: str) -> str:
+        txt = str(text).lower().translate(translator)
+        toks = txt.split()
+        toks = [w for w in toks if w.isalpha() and w not in stop_words]
+        return " ".join(toks)
 
-    return df["text"].apply(clean_text)
+    return df["Review"].astype(str).apply(_clean)
+
+
+def vocab_sizes(df: pd.DataFrame, cleaned_text: pd.Series) -> Tuple[int, int]:
+    vocab_before = len(set(" ".join(df["Review"].astype(str).str.lower()).split()))
+    vocab_after = len(set(" ".join(cleaned_text.astype(str)).split()))
+    return int(vocab_before), int(vocab_after)
 
 
 def vocab_richness(df: pd.DataFrame, cleaned_text: pd.Series) -> pd.DataFrame:
-    types = df["type"].unique()
-    rows = []
-    for t in types:
-        subset = cleaned_text[df["type"] == t]
-        all_words = " ".join(subset.astype(str)).split()
+    tmp = df.copy()
+    tmp["cleaned_text"] = cleaned_text
+
+    rows: List[Dict[str, object]] = []
+    for r in RATINGS:
+        subset = tmp[tmp["Rating"] == r]["cleaned_text"].astype(str)
+        all_words = " ".join(subset.tolist()).split()
         rows.append(
             {
-                "Category": t,
+                "Rating": f"{r}★",
                 "Total Words": int(len(all_words)),
                 "Unique Words": int(len(set(all_words))),
             }
@@ -292,18 +213,15 @@ def vocab_richness(df: pd.DataFrame, cleaned_text: pd.Series) -> pd.DataFrame:
 
 
 def fig_vocab_richness(stats_df: pd.DataFrame) -> go.Figure:
-    fig = make_subplots(
-        rows=1,
-        cols=2,
-        subplot_titles=("Total Words", "Unique Vocabulary Size"),
-    )
+    fig = make_subplots(rows=1, cols=2, subplot_titles=("Total Words", "Unique Vocabulary Size"))
 
     for _, row in stats_df.iterrows():
-        color = COLORS.get(_normalize_type(row["Category"]), "#333333")
+        r_int = int(str(row["Rating"])[0])
+        color = COLORS_RATING.get(r_int, "#333")
         fig.add_trace(
             go.Bar(
-                name=row["Category"],
-                x=[row["Category"]],
+                name=row["Rating"],
+                x=[row["Rating"]],
                 y=[row["Total Words"]],
                 marker_color=color,
             ),
@@ -312,8 +230,8 @@ def fig_vocab_richness(stats_df: pd.DataFrame) -> go.Figure:
         )
         fig.add_trace(
             go.Bar(
-                name=row["Category"],
-                x=[row["Category"]],
+                name=row["Rating"],
+                x=[row["Rating"]],
                 y=[row["Unique Words"]],
                 marker_color=color,
                 showlegend=False,
@@ -323,69 +241,68 @@ def fig_vocab_richness(stats_df: pd.DataFrame) -> go.Figure:
         )
 
     fig.update_layout(
-        title_text="Vocabulary Richness Comparison",
+        title_text="Vocabulary Richness by Rating (1–5★)",
         template="plotly_white",
         barmode="group",
-        height=420,
-        margin=dict(l=40, r=20, t=60, b=40),
+        height=520,
     )
     return fig
 
 
-def fig_top50_words_by_type(df: pd.DataFrame, cleaned_text: pd.Series) -> Dict[str, go.Figure]:
-    from collections import Counter
+def fig_top50_words_by_rating(df: pd.DataFrame, cleaned_text: pd.Series) -> Dict[int, go.Figure]:
+    tmp = df.copy()
+    tmp["cleaned_text"] = cleaned_text
+    out: Dict[int, go.Figure] = {}
 
-    types = df["type"].unique().tolist()
-    figures: Dict[str, go.Figure] = {}
-
-    for t in types:
-        words = " ".join(cleaned_text[df["type"] == t]).split()
-        top_50 = Counter(words).most_common(50)
-        if not top_50:
+    for rating in RATINGS:
+        subset_words = " ".join(tmp[tmp["Rating"] == rating]["cleaned_text"].astype(str)).split()
+        if not subset_words:
             continue
-
-        x_words, counts = zip(*top_50)
+        counts: Dict[str, int] = {}
+        for w in subset_words:
+            counts[w] = counts.get(w, 0) + 1
+        top_50 = sorted(counts.items(), key=lambda x: x[1], reverse=True)[:50]
+        words = [w for w, _ in top_50]
+        freqs = [c for _, c in top_50]
         fig = go.Figure(
             data=[
                 go.Bar(
-                    x=list(x_words),
-                    y=list(counts),
-                    marker_color=COLORS.get(_normalize_type(t), "#333333"),
+                    x=words,
+                    y=freqs,
+                    marker_color=COLORS_RATING[rating],
                 )
             ]
         )
         fig.update_layout(
-            title=f"Top 50 Frequent Words in Class: {t}",
+            title=f"Top 50 Frequent Words — Rating {rating}★ Reviews",
             xaxis_title="Words",
             yaxis_title="Frequency",
             template="plotly_white",
             xaxis_tickangle=-45,
             height=520,
-            margin=dict(l=40, r=20, t=60, b=80),
         )
-        figures[str(t)] = fig
+        out[rating] = fig
 
-    return figures
+    return out
 
 
-def fig_tfidf_top_terms(df: pd.DataFrame, cleaned_text: pd.Series) -> Dict[str, go.Figure]:
-    vectorizer = TfidfVectorizer(max_features=5000)
-    tfidf_matrix = vectorizer.fit_transform(cleaned_text)
-    feature_names = vectorizer.get_feature_names_out()
+def fig_tfidf_top_terms(
+    df: pd.DataFrame, cleaned_text: pd.Series, max_features: int = 5000
+) -> Dict[int, go.Figure]:
+    vec = TfidfVectorizer(max_features=max_features)
+    tfidf = vec.fit_transform(cleaned_text.astype(str))
+    feature_names = vec.get_feature_names_out()
 
-    figures: Dict[str, go.Figure] = {}
-    types = df["type"].unique().tolist()
-
-    for t in types:
-        cat_indices = df[df["type"] == t].index
-        if len(cat_indices) == 0:
+    out: Dict[int, go.Figure] = {}
+    for rating in RATINGS:
+        idx = df[df["Rating"] == rating].index
+        if len(idx) == 0:
             continue
-
-        cat_tfidf = tfidf_matrix[cat_indices]
-        mean_scores = np.array(cat_tfidf.mean(axis=0)).flatten()
-        top_indices = mean_scores.argsort()[-20:][::-1]
-        top_words = [feature_names[i] for i in top_indices]
-        top_scores = [float(mean_scores[i]) for i in top_indices]
+        cat = tfidf[idx]
+        mean_scores = np.array(cat.mean(axis=0)).flatten()
+        top_idx = mean_scores.argsort()[-20:][::-1]
+        top_words = [str(feature_names[i]) for i in top_idx]
+        top_scores = [float(mean_scores[i]) for i in top_idx]
 
         fig = go.Figure(
             data=[
@@ -393,117 +310,110 @@ def fig_tfidf_top_terms(df: pd.DataFrame, cleaned_text: pd.Series) -> Dict[str, 
                     x=top_scores,
                     y=top_words,
                     orientation="h",
-                    marker_color=COLORS.get(_normalize_type(t), "#333333"),
+                    marker_color=COLORS_RATING[rating],
                     text=[f"{s:.3f}" for s in top_scores],
                     textposition="outside",
                 )
             ]
         )
         fig.update_layout(
-            title=f"Top 20 TF-IDF Characteristic Terms in Class: {t}",
+            title=f"Top 20 TF-IDF Terms — Rating {rating}★ Reviews",
             xaxis_title="Mean TF-IDF Score",
             yaxis={"autorange": "reversed"},
             template="plotly_white",
-            height=640,
-            margin=dict(l=80, r=20, t=60, b=40),
+            width=860,
+            height=650,
         )
+        out[rating] = fig
 
-        figures[str(t)] = fig
-
-    return figures
+    return out
 
 
-def fig_bigrams(df: pd.DataFrame, cleaned_text: pd.Series) -> Dict[str, go.Figure]:
-    bigram_vectorizer = CountVectorizer(ngram_range=(2, 2), max_features=2000)
-    figures: Dict[str, go.Figure] = {}
+def fig_bigrams(
+    df: pd.DataFrame, cleaned_text: pd.Series, max_features: int = 5000
+) -> Dict[int, go.Figure]:
+    tmp = df.copy()
+    tmp["cleaned_text"] = cleaned_text
 
-    types = df["type"].unique().tolist()
-
-    for t in types:
-        texts = cleaned_text[df["type"] == t]
-        if len(texts) == 0:
+    out: Dict[int, go.Figure] = {}
+    for rating in RATINGS:
+        subset = tmp[tmp["Rating"] == rating]["cleaned_text"].astype(str).tolist()
+        if not subset:
             continue
 
-        try:
-            bigram_matrix = bigram_vectorizer.fit_transform(texts)
-        except ValueError:
+        vec = CountVectorizer(ngram_range=(2, 2), max_features=max_features)
+        mat = vec.fit_transform(subset)
+        freqs = list(zip(vec.get_feature_names_out(), mat.sum(axis=0).A1))
+        freqs = sorted(freqs, key=lambda x: x[1], reverse=True)[:20]
+        if not freqs:
             continue
 
-        bigram_freqs = np.array(bigram_matrix.sum(axis=0)).flatten()
-        bigram_names = bigram_vectorizer.get_feature_names_out()
-
-        top_indices = bigram_freqs.argsort()[-20:][::-1]
-        top_bigrams = [bigram_names[i] for i in top_indices]
-        top_counts = [int(bigram_freqs[i]) for i in top_indices]
+        phrases = [p for p, _ in freqs]
+        counts = [int(c) for _, c in freqs]
 
         fig = go.Figure(
             data=[
                 go.Bar(
-                    x=top_counts,
-                    y=top_bigrams,
+                    x=counts,
+                    y=phrases,
                     orientation="h",
-                    marker_color=COLORS.get(_normalize_type(t), "#333333"),
-                    text=top_counts,
+                    marker_color=COLORS_RATING[rating],
+                    text=[str(c) for c in counts],
                     textposition="outside",
                 )
             ]
         )
         fig.update_layout(
-            title=f"Top 20 Bigrams in Class: {t}",
+            title=f"Top 20 Bigrams — Rating {rating}★ Reviews",
             xaxis_title="Frequency",
             yaxis={"autorange": "reversed"},
             template="plotly_white",
-            height=640,
-            margin=dict(l=80, r=20, t=60, b=40),
+            width=860,
+            height=650,
         )
+        out[rating] = fig
 
-        figures[str(t)] = fig
-
-    return figures
+    return out
 
 
-def fig_category_similarity(df: pd.DataFrame) -> Tuple[go.Figure, List[str], np.ndarray]:
-    categories = sorted(df["type"].unique().tolist())
-    vectorizer = TfidfVectorizer(
-        max_features=5000, stop_words=list(ENGLISH_STOP_WORDS)
+def fig_rating_similarity(df: pd.DataFrame, max_features: int = 5000) -> Tuple[go.Figure, List[str], List[List[float]]]:
+    cos_vectorizer = TfidfVectorizer(
+        max_features=max_features,
+        stop_words=list(ENGLISH_STOP_WORDS),
     )
-    tfidf_matrix = vectorizer.fit_transform(df["text"].astype(str))
+    tfidf = cos_vectorizer.fit_transform(df["Review"].astype(str))
 
-    n_cats = len(categories)
-    sim = np.zeros((n_cats, n_cats), dtype=float)
-
-    for i, cat1 in enumerate(categories):
-        cat1_idx = df[df["type"] == cat1].index
-        v1 = tfidf_matrix[cat1_idx]
-
-        for j, cat2 in enumerate(categories):
-            cat2_idx = df[df["type"] == cat2].index
-            v2 = tfidf_matrix[cat2_idx]
-
+    n = len(RATINGS)
+    sim_mat = np.zeros((n, n), dtype=float)
+    for i, r1 in enumerate(RATINGS):
+        v1 = tfidf[df[df["Rating"] == r1].index]
+        for j, r2 in enumerate(RATINGS):
+            v2 = tfidf[df[df["Rating"] == r2].index]
             pairwise = cosine_similarity(v1, v2)
-            sim[i, j] = float(np.mean(pairwise))
+            sim_mat[i, j] = float(np.mean(pairwise))
 
+    labels = [f"{r}★" for r in RATINGS]
     fig = go.Figure(
         data=go.Heatmap(
-            z=sim,
-            x=categories,
-            y=categories,
-            colorscale="Purples",
-            text=np.round(sim, 4),
+            z=sim_mat,
+            x=labels,
+            y=labels,
+            colorscale="Blues",
+            text=np.round(sim_mat, 4),
             texttemplate="%{text}",
             textfont={"size": 12},
             colorbar=dict(title="Similarity"),
         )
     )
-
     fig.update_layout(
-        title="Category Similarity Matrix (Mean Cosine Similarity)",
-        xaxis_title="Category",
-        yaxis_title="Category",
+        title="Rating Similarity Matrix — Mean Cosine Similarity (5×5)",
+        xaxis_title="Rating",
+        yaxis_title="Rating",
+        width=650,
+        height=600,
         template="plotly_white",
-        height=520,
-        margin=dict(l=60, r=20, t=60, b=40),
         yaxis={"autorange": "reversed"},
     )
 
-    return fig, categories, sim
+    sim_list = sim_mat.round(6).tolist()
+    return fig, labels, sim_list
