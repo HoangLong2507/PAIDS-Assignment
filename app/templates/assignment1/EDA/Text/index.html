@@ -29,11 +29,11 @@
         </a>
 
         <nav class="toc">
-          <a href="#part-0">Part 0</a>
-          <a href="#part-1">Part 1</a>
-          <a href="#part-2">Part 2</a>
-          <a href="#part-3">Part 3</a>
-          <a href="#part-4">Part 4</a>
+          <a href="#part-0">Part 1</a>
+          <a href="#part-1">Part 2</a>
+          <a href="#part-2">Part 3</a>
+          <a href="#part-3">Part 4</a>
+          <a href="#part-4">Part 5</a>
         </nav>
       </div>
     </header>
@@ -44,7 +44,7 @@
       </div>
 
       <section class="card part-card" id="part-0">
-        <h2 class="part-title">Part 0: Environment Setup &amp; Data Loading</h2>
+        <h2 class="part-title">Part 1: Environment Setup &amp; Data Loading</h2>
         <p class="part-subtitle">Local CSV load + basic dataset metadata</p>
       </section>
 
@@ -91,12 +91,12 @@
       </section>
 
       <section class="card part-card" id="part-1">
-        <h2 class="part-title">Part 1: Raw Data Analysis</h2>
+        <h2 class="part-title">Part 2: Raw Data Analysis</h2>
         <p class="part-subtitle">Overview, rating distribution, and raw stop words</p>
       </section>
 
       <section class="card" id="part-1-1">
-        <h3>1.1 Dataset Overview (per-rating length)</h3>
+        <h3>2.1 Dataset Overview (per-rating length)</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
           Average word and character counts per rating (1★–5★).
         </h4>
@@ -121,8 +121,105 @@
         </table>
       </section>
 
+      <section class="card" id="part-1-2">
+        <h3>2.2 Sample Reviews</h3>
+
+        <!-- Rating 1★ -->
+        <div class="sample-rating-group">
+          <div class="sample-rating-header">
+            <span class="star-badge star-1">1★ Terrible</span>
+          </div>
+          <div class="review-cards">
+            <div class="review-card">
+              <div class="review-card-label">Sample 1:</div>
+              <p class="review-text">horrible customer service hotel stay february 3rd 4th 2007 — my friend picked hotel monaco appealing website online package included champagne late checkout 3 free valet gift spa weekend. friend checked room hours earlier came later, pulled valet young man just stood, asked valet open said, pull bags didn't offer help, got garment bag suitcase came car key room number says not valet, car park car street pull, left key working asked valet park car gets. went room fine bottle champagne oil lotion gift spa, dressed went came got bed noticed blood drops pillows sheets pillows, disgusted just unbelievable. called desk sent somebody 20 minutes later, swapped sheets left apologizing. sunday morning called desk speak management sheets aggravated rude. apparently no manager kind supervisor weekend wait monday morning. young man spoke said cover food adding person changed sheets said fresh blood rude tone. checkout 3pm package booked. 12–1:30 staff maids tried walk room opening door apologizing closing. people called saying check 12 remind package. finally packed things went downstairs check. quickly signed paper took. way took closer look room, unfortunately covered food offered charged valet. called desk ask charges lady answered snapped saying aware problem experienced monday like told earlier. life treated like hotel, not sure hotel constantly problems lucky ones stay — recommend anybody know.</p>
+            </div>
+            <div class="review-card">
+              <div class="review-card-label">Sample 2:</div>
+              <p class="review-text">noise airconditioner — a standard. arranged stay travel agency unfortunately warwick seattle hotel dissapointment trip. 3 night stay warwick changed 3 rooms. starting minute stay hotel personnel didn't make feel like guest like intruder, reluctant help solve complaints. hotel right downtown 5 minutes really good restaurants like good thing. availability room offered 2nd floor window directly opening car parking level, changed room. 3 rooms loud sound coming air conditioner/heating — unbelievable hotel. hotel personnel told standard noise rooms. tried avoid using night order sleep possible watching tv loudly.</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="rating-divider">
+
+        <!-- Rating 2★ -->
+        <div class="sample-rating-group">
+          <div class="sample-rating-header">
+            <span class="star-badge star-2">2★ Poor</span>
+          </div>
+          <div class="review-cards">
+            <div class="review-card">
+              <div class="review-card-label">Sample 1:</div>
+              <p class="review-text">ok nothing special — charge diamond member hilton decided chain shot 20th anniversary seattle. start booked suite paid extra website description not. suite bedroom bathroom standard hotel room. took printed reservation desk showed said things like tv couch etc desk clerk told oh mixed suites description kimpton website sorry free breakfast. got kidding. embassy suits sitting room bathroom bedroom unlike kimpton calls suite. 5 day stay offer correct false advertising. send kimpton preferred guest website email asking failure provide suite advertised website reservation description furnished hard copy reservation printout website desk manager duty did not reply solution. send email trip guest survey did not follow email mail. guess tell concerned guest. staff ranged indifferent not helpful. asked desk good breakfast spots neighborhood hood told no hotels. gee best breakfast spots seattle 1/2 block away convenient hotel does not know exist. arrived late night 11 pm inside run bellman busy chating cell phone help bags. prior arrival emailed hotel inform 20th anniversary half really picky wanted make sure good. got nice email saying like deliver bottle champagne chocolate covered strawberries room arrival celebrate, told needed foam pillows. arrival no champagne strawberries no foam pillows great room view alley high rise building good not better housekeeping staff cleaner room property. impressed left morning shopping room got short trips 2 hours. beds comfortable. not good ac-heat control 4x4 inch screen bring green shine directly eyes night. this not 4 star hotel clean business hotel super high rates, better chain hotels seattle.</p>
+            </div>
+            <div class="review-card">
+              <div class="review-card-label">Sample 2:</div>
+              <p class="review-text">poor value — stayed monaco seattle july. nice hotel priced 100–150 night not. hotel takes beating quotient. experience simply average, nothing exceptional paying 300+. wife stayed nicest suites 200/night felt like overpaying. best advice shop. quality-wise league average marriott nice best western.</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="rating-divider">
+
+        <!-- Rating 3★ -->
+        <div class="sample-rating-group">
+          <div class="sample-rating-header">
+            <span class="star-badge star-3">3★ Average</span>
+          </div>
+          <div class="review-cards">
+            <div class="review-card">
+              <div class="review-card-label">Sample 1:</div>
+              <p class="review-text">nice rooms not 4* experience — hotel monaco seattle good hotel but not 4* level. positives: large bathroom, mediterranean suite comfortable bed/pillows, attentive housekeeping staff. negatives: ac unit malfunctioned stay, desk disorganized — missed 3 separate wakeup calls, concierge busy hard to reach, did not provide guidance for special requests. tv hard use, ipod sound dock suite non functioning. decided book mediterranean suite 3 night weekend stay. 1st choice rest party filled. comparison spent 45 night larger square footage room great soaking tub whirlpool jets nice shower. before stay hotel arranged car service price 53 tip reasonable driver waiting arrival. checkin easy, downside room picked 2 person jacuzi tub no bath accessories salts bubble bath. night got 12/1a checked voucher bottle champagne nice gesture. fish waiting room, impression room huge open space felt room big. tv far away bed chore change channel. ipod dock broken disappointing. in morning asked desk check thermostat said 65f — 74 2 degrees warm. got room night no, 1st drop desk, called maintenance came look thermostat — told play settings, happy digital box won't work. asked wakeup 10am morning — didn't happen. called later 6pm nap wakeup forgot. 10am wakeup morning yep forgotten. bathroom facilities great, room surprised room sold whirlpool bath tub without bath amenities, great relax water jets going.</p>
+            </div>
+            <div class="review-card">
+              <div class="review-card-label">Sample 2:</div>
+              <p class="review-text">nice hotel not nice staff — hotel lovely but staff quite rude. bellhop desk clerk going way make things difficult. waited forever check, heavy bags no help getting through double doors room. worst desk clerk checking — tap tap tap — car waited pick 20 minutes. got home noticed 1,000 dollar hold credit card took 5 phonecalls 2 faxes 1 week resolved. stay warwick 4th lenora rooms ok but all friendly faces tiring day airport.</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="rating-divider">
+
+        <!-- Rating 4★ -->
+        <div class="sample-rating-group">
+          <div class="sample-rating-header">
+            <span class="star-badge star-4">4★ Good</span>
+          </div>
+          <div class="review-cards">
+            <div class="review-card">
+              <div class="review-card-label">Sample 1:</div>
+              <p class="review-text">nice hotel expensive parking — got good deal stay hotel anniversary. arrived late evening took advice previous reviews did valet parking. check quick easy. little disappointed non-existent view room — room clean nice size. bed comfortable woke stiff neck high pillows. not soundproof like — heard music room night morning loud bangs doors opening closing, hear people talking hallway, maybe just noisy neighbors. aveda bath products nice. did not goldfish stay nice touch taken advantage staying longer. location great walking distance shopping. overall nice experience having pay 40 parking night.</p>
+            </div>
+            <div class="review-card">
+              <div class="review-card-label">Sample 2:</div>
+              <p class="review-text">excellent staff — housekeeping quality hotel. staff make feel home. experienced exceptional service desk staff, concierge, door men. maid service needs work — maid failed tuck sheets foot bed instance soiled sheets used. staff quickly resolved soiled sheets issue. guess relates employee not reflection rest staff. received excellent advice concierge regarding restaurants area. happy hour wine tasting nice touch. staff went way make feel home. great location like close good food shopping. took play 5th street theater well. pikes market pioneer square access mono rail short walking distance.</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="rating-divider">
+
+        <!-- Rating 5★ -->
+        <div class="sample-rating-group">
+          <div class="sample-rating-header">
+            <span class="star-badge star-5">5★ Excellent</span>
+          </div>
+          <div class="review-cards">
+            <div class="review-card">
+              <div class="review-card-label">Sample 1:</div>
+              <p class="review-text">unique, great stay — wonderful time hotel monaco. location excellent short stroll main downtown shopping area. pet friendly room showed no signs animal hair smells. monaco suite sleeping area big striped curtains pulled closed nice touch felt cosy. goldfish named brandi enjoyed. did not partake free wine coffee/tea service lobby thought great feature. great staff friendly. free wireless internet hotel worked suite 2 laptops. decor lovely eclectic mix patterns color palette. animal print bathrobes feel like rock stars. nice did not look like sterile chain hotel — hotel personality excellent stay.</p>
+            </div>
+            <div class="review-card">
+              <div class="review-card-label">Sample 2:</div>
+              <p class="review-text">great stay — went seahawk game awesome. downfall view building did not complain. room huge staff helpful. booked hotels website seahawk package. no charge parking got voucher taxi. problem taxi driver did not want accept voucher barely spoke english. funny thing — speak arabic called started making comments girlfriend cell phone buddy, took second realize just said fact speak language face priceless. told head doorman issue called cab company promptly — apologized offered pay taxi. great walk did not mind. right christmas wonderful lights. hotel maintained foyer awesome. wine tasting available evening. best dog — taking st. bernard time family. safes hotel located service desk room. bathroom huge jetted tub. funny house keeping walked girlfriend getting dressed — did not hear knock doing turn service. place recommend price. check online deals just good not better, website contains deals vouchers travel websites do not tell.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="card" id="part-1-3">
-        <h3>1.3 Category Distribution (Ratings)</h3>
+        <h3>2.3 Category Distribution (Ratings)</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
           Counts and percentages for each rating class.
         </h4>
@@ -154,7 +251,7 @@
       </section>
 
       <section class="card" id="part-1-4">
-        <h3>1.4 Stop Words Analysis (Raw Data)</h3>
+        <h3>2.4 Stop Words Analysis (Raw Data)</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
           Most frequent stop words in the raw corpus (before cleaning).
         </h4>
@@ -178,7 +275,7 @@
       </section>
 
       <section class="card" id="part-2-1">
-        <h3>2.1 Preprocessing Data</h3>
+        <h3>3.1 Preprocessing Data</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
           Vocabulary size before vs after cleaning.
         </h4>
@@ -200,7 +297,7 @@
       </section>
 
       <section class="card" id="part-2-2">
-        <h3>2.2 Vocabulary Richness</h3>
+        <h3>3.2 Vocabulary Richness</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
           Total words and unique vocab size per rating, on cleaned text.
         </h4>
@@ -228,7 +325,7 @@
       </section>
 
       <section class="card" id="part-2-3">
-        <h3>2.3 Top 50 Words Visualization</h3>
+        <h3>3.3 Top 50 Words Visualization</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
           Top 50 words per rating level (1★–5★).
         </h4>
@@ -242,7 +339,7 @@
       </section>
 
       <section class="card" id="part-2-4">
-        <h3>2.4 TF-IDF Top Terms</h3>
+        <h3>3.4 TF-IDF Top Terms</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
           Top 20 discriminative TF-IDF terms per rating.
         </h4>
@@ -256,7 +353,7 @@
       </section>
 
       <section class="card" id="part-2-5">
-        <h3>2.5 N-gram Analysis (Bigrams)</h3>
+        <h3>3.5 N-gram Analysis (Bigrams)</h3>
         <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
           Top 20 bigrams per rating on cleaned text.
         </h4>
@@ -270,7 +367,7 @@
       </section>
 
       <section class="card part-card" id="part-3">
-        <h2 class="part-title">Part 3: Category Similarity Analysis</h2>
+        <h2 class="part-title">Part 4: Category Similarity Analysis</h2>
         <p class="part-subtitle">Cosine similarity of TF-IDF vectors (rating × rating)</p>
       </section>
 
@@ -306,7 +403,7 @@
       </section>
 
       <section class="card part-card" id="part-4">
-        <h2 class="part-title">Part 4: Key Insight</h2>
+        <h2 class="part-title">Part 5: Key Insight</h2>
         <p class="part-subtitle">Summary extracted from the notebook</p>
       </section>
 
