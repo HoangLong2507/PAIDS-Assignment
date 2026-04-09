@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Image EDA — Caltech-UCSD Birds-200-2011</title>
+
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../../static/assignment1.styles.css" />
+  </head>
+
+  <body>
+    <header class="topbar">
+      <div class="container nav">
+        <a class="brand" href="#">
+          <span class="brand-badge" aria-hidden="true"></span>
+          <span class="brand-text">
+            <span class="brand-title">Image EDA</span>
+          </span>
+        </a>
+
+        <nav class="toc">
+          <a href="#part-1">Part 1</a>
+          <a href="#part-2">Part 2</a>
+          <a href="#part-3">Part 3</a>
+          <a href="#part-4">Part 4</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="return-btn">
+        <a class="btn" href="../" style="text-decoration: none; color: black">← Back</a>
+      </div>
+
+      <!-- ──────────── PART 1 ──────────── -->
+      <section class="card part-card" id="part-1">
+        <h2 class="part-title">Part 1: Core EDA Report</h2>
+        <p class="part-subtitle">Basic image statistics, dimensions, and color space analysis.</p>
+      </section>
+
+      <section class="card" id="p1-overview">
+        <h3>1. Dataset Overview</h3>
+
+        <div class="grid-3">
+          <div class="metric">
+            <div class="metric-label">Total images</div>
+            <div class="metric-value" id="ov-total-images">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Total breeds</div>
+            <div class="metric-value" id="ov-part-locations">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Part locations</div>
+            <div class="metric-value" id="ov-binary-attributes">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Binary attributes</div>
+            <div class="metric-value" id="ov-bounding-box-attr">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Bounding box</div>
+            <div class="metric-value" id="ov-bounding-box">—</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 12px">
+          <div class="plot" id="fig-split"></div>
+          <div>
+            <table class="table">
+              <thead><tr><th>Split</th><th>Count</th></tr></thead>
+              <tbody id="splits-tbody"><tr><td colspan="2">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="p1-image-size">
+        <h3>2. Image Size Distribution &amp; Aspect Ratio</h3>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p1-size-scatter"></div>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p1-file-size-hist"></div>
+        <div class="plot" id="fig-p1-aspect-ratio-hist"></div>
+
+        <div class="remark" style="margin-top: 12px">
+          <div class="remark-title">Remark</div>
+          <ul>
+            <li><b>Image dimensions vary, but within practical limits</b> — Width and height are spread across a moderate range, with many samples near common resize boundaries.</li>
+            <li><b>Aspect ratio distribution is concentrated</b> — Most images fall near common photo ratios (roughly around 1.0 to 1.5).</li>
+            <li><b>File size is right-skewed</b> — Most samples are small-to-medium files.</li>
+            <li><b>Breed-level coverage appears balanced at a high level</b> — Top breeds show similar image counts.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card" id="p1-color-quality">
+        <h3>3. Color Space Analysis &amp; Quality Metrics</h3>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p1-rgb-3d"></div>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p1-sharp-vs-contrast"></div>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p1-rgb-box"></div>
+
+        <div class="remark" style="margin-top: 12px">
+          <div class="remark-title">Remark</div>
+          <ul>
+            <li><b>RGB channel behavior is stable and natural</b> — Mean channel values stay in realistic ranges.</li>
+            <li><b>Brightness and contrast are centered with moderate spread</b> — Brightness and contrast histograms are unimodal.</li>
+            <li><b>Sharpness has a heavy tail</b> — Most images have moderate sharpness, with fewer very high-sharpness outliers.</li>
+            <li><b>Overall data quality profile is suitable for classification pipelines.</b></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ──────────── PART 2 ──────────── -->
+      <section class="card part-card" id="part-2">
+        <h2 class="part-title">Part 2: Detection EDA Report</h2>
+        <p class="part-subtitle">Bounding boxes + spatial distribution + quality metrics</p>
+      </section>
+
+      <section class="card" id="p2-bbox">
+        <h3>1. Bounding box properties</h3>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p2-bbox-mean-median-bars"></div>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p2-bbox-ar-donut"></div>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p2-bbox-area-hist"></div>
+        <div class="plot" id="fig-p2-bbox-wh-scatter"></div>
+
+        <div class="remark" style="margin-top: 12px">
+          <div class="remark-title">Remark</div>
+          <ul>
+            <li><b>Bounding boxes are moderate in size and fairly stable</b>. Mean width is <b>256.7 px</b> and mean height is <b>231.9 px</b>.</li>
+            <li><b>Aspect ratios are mostly landscape</b>. The dataset has <b>53.7% landscape</b>, <b>30.4% portrait</b>, and <b>15.9% square</b> boxes.</li>
+            <li><b>Area distribution is right-skewed</b>. Most boxes lie in the low-to-mid area range.</li>
+            <li><b>Size categories separate cleanly in width-height space</b>.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card" id="p2-spatial">
+        <h3>2. Spatial Distribution Analysis</h3>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p2-spatial-heatmap"></div>
+        <div class="plot" id="fig-p2-spatial-dist-hist"></div>
+
+        <div class="remark" style="margin-top: 12px">
+          <div class="remark-title">Remark</div>
+          <ul>
+            <li><b>Strong center bias is present</b> — Most boxes cluster around the middle of the image.</li>
+            <li><b>Normalized area distribution is concentrated</b> — Many boxes have moderate normalized area.</li>
+            <li><b>There is still positional diversity</b> — A visible long tail indicates off-center samples exist.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card" id="p2-quality">
+        <h3>3. Quality Analysis</h3>
+        <div class="grid-2">
+          <div class="plot" style="margin-bottom: 16px" id="fig-p2-quality-area-cv-barh"></div>
+          <div class="plot" id="fig-p2-quality-coverage-barh"></div>
+        </div>
+      </section>
+
+      <!-- ──────────── PART 3 ──────────── -->
+      <section class="card part-card" id="part-3">
+        <h2 class="part-title">Part 3: Segmentation EDA Report</h2>
+        <p class="part-subtitle">Pixel / shape / boundary + segmentation quality</p>
+      </section>
+
+      <section class="card" id="p3-pixel">
+        <h3>1. Pixel Analysis</h3>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p3-pixel-donut"></div>
+        <div class="plot" id="fig-p3-pixel-mean-std-bars"></div>
+
+        <div class="remark" style="margin-top: 12px">
+          <div class="remark-title">Remark</div>
+          <ul>
+            <li>Background overwhelmingly dominates at ~83.63%, meaning birds occupy only a small fraction of each image on average.</li>
+            <li>Foreground (bird body) accounts for ~10.58% and boundary (transition region) for ~5.80% of image pixels.</li>
+            <li>The relatively low standard deviations indicate this pattern is consistent across all 200 breeds.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card" id="p3-shape">
+        <h3>2. Shape Analysis</h3>
+        <div class="plot-with-remark">
+          <div class="plot" id="fig-p3-shape-metrics-bars"></div>
+
+          <div class="remark remark-side" style="margin-top: 12px">
+            <div class="remark-title">Remark</div>
+            <ul>
+              <li>Convexity mean of 0.739 shows bird silhouettes are moderately convex.</li>
+              <li>Compactness mean of 0.454 confirms that bird shapes are far from circular.</li>
+              <li>Eccentricity mean of 0.833 further reinforces that most bird masks are significantly elongated.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="p3-boundary">
+        <h3>3. Mask Analysis (Boundary)</h3>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p3-boundary-thickness-bar"></div>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p3-boundary-smoothness-bar"></div>
+        <div class="plot" id="fig-p3-boundary-complexity-bar"></div>
+
+        <div class="remark" style="margin-top: 12px">
+          <div class="remark-title">Remark</div>
+          <ul>
+            <li>Average boundary thickness of 5.92 px indicates a moderate transition zone between foreground and background.</li>
+            <li>Smoothness mean of 0.641 shows boundaries are reasonably smooth but not perfectly clean.</li>
+            <li>Complexity mean of 1046.88 is notably high, reflecting detailed and irregular outlines typical of bird silhouettes.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card" id="p3-quality">
+        <h3>4. Quality Analysis</h3>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p3-segq-coverage-barh"></div>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p3-segq-coverage-cv-barh"></div>
+        <div class="plot" id="fig-p3-segq-fg-cv-barh"></div>
+
+        <div class="remark" style="margin-top: 12px">
+          <div class="remark-title">Remark</div>
+          <ul>
+            <li>Very low avg_coverage (0.164) confirms that birds typically occupy only ~16.4% of the image area.</li>
+            <li>High coverage_cv (0.505) reveals significant within-breed variation in object scale.</li>
+            <li>High fg_cv (0.616) with only 27/200 breeds below 0.50 shows considerable intra-breed variation.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ──────────── PART 4 ──────────── -->
+      <section class="card part-card" id="part-4">
+        <h2 class="part-title">Part 4: Classification EDA Report</h2>
+        <p class="part-subtitle">Class distribution + split + embeddings</p>
+      </section>
+
+      <section class="card" id="p4-class-dist">
+        <h3>1. Class Distribution</h3>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p4-class-hist"></div>
+        <div class="plot" id="fig-p4-top10-classes-barh"></div>
+
+        <div class="remark" style="margin-top: 12px">
+          <div class="remark-title">Remark</div>
+          <ul>
+            <li>The class histogram is fairly even, and the max/min gap is limited compared with many fine-grained datasets.</li>
+            <li>This balance is a good signal for stable classifier training and more reliable macro-level metrics.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card" id="p4-split">
+        <h3>2. Train/Val/Test Distribution</h3>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p4-split-counts-bar"></div>
+        <div class="plot" id="fig-p4-split-ratio-pie"></div>
+
+        <div class="remark" style="margin-top: 12px">
+          <div class="remark-title">Remark</div>
+          <ul>
+            <li>Keep validation/test split stable to compare experiments fairly.</li>
+            <li>If any split is too small, metrics may fluctuate strongly across runs.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card" id="p4-embed">
+        <h3>3. Embedding Analysis</h3>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p4-tsne-scatter"></div>
+        <div class="plot" style="margin-bottom: 16px" id="fig-p4-umap-scatter"></div>
+        <div class="plot" id="fig-p4-pca-cumvar"></div>
+
+        <div class="remark" style="margin-top: 12px">
+          <div class="remark-title">Remark</div>
+          <ul>
+            <li>The t-SNE/UMAP structure shows several local clusters but still noticeable overlap between similar bird breeds.</li>
+            <li>Feature separability is present but fine-grained confusion is expected for visually close species.</li>
+            <li>Better backbone features or metric-learning objectives could improve inter-breed margins.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      async function loadJSON(path) {
+        const r = await fetch(path);
+        if (!r.ok) throw new Error(`Failed: ${path} → ${r.status}`);
+        return r.json();
+      }
+
+      function renderPlotly(divId, jsonPath) {
+        return loadJSON(jsonPath).then(spec => {
+          Plotly.react(divId, spec.data, spec.layout, { responsive: true });
+        }).catch(err => {
+          const el = document.getElementById(divId);
+          if (el) el.textContent = 'Chart unavailable';
+          console.warn(divId, err);
+        });
+      }
+
+      (async () => {
+        // Overview
+        try {
+          const ov = await loadJSON('./data/overview.json');
+          document.getElementById('ov-total-images').textContent = Number(ov.total_images).toLocaleString();
+          document.getElementById('ov-part-locations').textContent = ov.total_breeds;
+          document.getElementById('ov-binary-attributes').textContent = ov.part_locations;
+          document.getElementById('ov-bounding-box-attr').textContent = ov.binary_attributes;
+          document.getElementById('ov-bounding-box').textContent = ov.bounding_box;
+          document.getElementById('splits-tbody').innerHTML = Object.entries(ov.splits || {}).map(
+            ([k, v]) => `<tr><td>${k}</td><td>${Number(v).toLocaleString()}</td></tr>`
+          ).join('');
+        } catch (e) { console.warn('overview:', e); }
+
+        // All figures
+        const figMap = [
+          ['fig-split', 'fig_split'],
+          ['fig-p1-size-scatter', 'fig_p1_size_scatter'],
+          ['fig-p1-file-size-hist', 'fig_p1_file_size_hist'],
+          ['fig-p1-aspect-ratio-hist', 'fig_p1_aspect_ratio_hist'],
+          ['fig-p1-rgb-3d', 'fig_p1_rgb_3d'],
+          ['fig-p1-sharp-vs-contrast', 'fig_p1_sharp_vs_contrast'],
+          ['fig-p1-rgb-box', 'fig_p1_rgb_box'],
+          ['fig-p2-bbox-mean-median-bars', 'fig_p2_bbox_mean_median_bars'],
+          ['fig-p2-bbox-ar-donut', 'fig_p2_bbox_ar_donut'],
+          ['fig-p2-bbox-area-hist', 'fig_p2_bbox_area_hist'],
+          ['fig-p2-bbox-wh-scatter', 'fig_p2_bbox_wh_scatter'],
+          ['fig-p2-spatial-heatmap', 'fig_p2_spatial_heatmap'],
+          ['fig-p2-spatial-dist-hist', 'fig_p2_spatial_dist_hist'],
+          ['fig-p2-quality-area-cv-barh', 'fig_p2_quality_area_cv_barh'],
+          ['fig-p2-quality-coverage-barh', 'fig_p2_quality_coverage_barh'],
+          ['fig-p3-pixel-donut', 'fig_p3_pixel_donut'],
+          ['fig-p3-pixel-mean-std-bars', 'fig_p3_pixel_mean_std_bars'],
+          ['fig-p3-shape-metrics-bars', 'fig_p3_shape_metrics_bars'],
+          ['fig-p3-boundary-thickness-bar', 'fig_p3_boundary_thickness_bar'],
+          ['fig-p3-boundary-smoothness-bar', 'fig_p3_boundary_smoothness_bar'],
+          ['fig-p3-boundary-complexity-bar', 'fig_p3_boundary_complexity_bar'],
+          ['fig-p3-segq-coverage-barh', 'fig_p3_segq_coverage_barh'],
+          ['fig-p3-segq-coverage-cv-barh', 'fig_p3_segq_coverage_cv_barh'],
+          ['fig-p3-segq-fg-cv-barh', 'fig_p3_segq_fg_cv_barh'],
+          ['fig-p4-class-hist', 'fig_p4_class_hist'],
+          ['fig-p4-top10-classes-barh', 'fig_p4_top10_classes_barh'],
+          ['fig-p4-split-counts-bar', 'fig_p4_split_counts_bar'],
+          ['fig-p4-split-ratio-pie', 'fig_p4_split_ratio_pie'],
+          ['fig-p4-tsne-scatter', 'fig_p4_tsne_scatter'],
+          ['fig-p4-umap-scatter', 'fig_p4_umap_scatter'],
+          ['fig-p4-pca-cumvar', 'fig_p4_pca_cumvar'],
+        ];
+
+        figMap.forEach(([divId, filename]) => {
+          renderPlotly(divId, `./data/${filename}.json`);
+        });
+      })();
+    </script>
+  </body>
+</html>

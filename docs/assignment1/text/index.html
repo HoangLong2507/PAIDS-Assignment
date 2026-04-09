@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Text EDA — TripAdvisor Hotel Reviews</title>
+
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../../static/assignment1.styles.css" />
+  </head>
+
+  <body>
+    <header class="topbar">
+      <div class="container nav">
+        <a class="brand" href="#">
+          <span class="brand-badge" aria-hidden="true"></span>
+          <span class="brand-text">
+            <span class="brand-title">Text EDA</span>
+            <span class="brand-sub">TripAdvisor Hotel Reviews</span>
+          </span>
+        </a>
+
+        <nav class="toc">
+          <a href="#part-0">Part 1</a>
+          <a href="#part-1">Part 2</a>
+          <a href="#part-2">Part 3</a>
+          <a href="#part-3">Part 4</a>
+          <a href="#part-4">Part 5</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="return-btn">
+        <a class="btn" href="../" style="text-decoration: none; color: black">← Back</a>
+      </div>
+
+      <section class="card part-card" id="part-0">
+        <h2 class="part-title">Part 1: Environment Setup &amp; Data Loading</h2>
+        <p class="part-subtitle">Local CSV load + basic dataset metadata</p>
+      </section>
+
+      <section class="card" id="overview">
+        <h3>📦 Dataset loaded</h3>
+
+        <div class="grid-4">
+          <div class="metric">
+            <div class="metric-label">Total Reviews</div>
+            <div class="metric-value" id="ov-total-reviews">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Total Features</div>
+            <div class="metric-value" id="ov-total-features">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Rating Range</div>
+            <div class="metric-value" id="ov-rating-range">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Duplicates dropped</div>
+            <div class="metric-value" id="ov-duplicates">—</div>
+          </div>
+        </div>
+
+        <div class="grid-4" style="margin-top: 10px">
+          <div class="metric">
+            <div class="metric-label">Missing Review</div>
+            <div class="metric-value" id="ov-missing-review">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Missing Rating</div>
+            <div class="metric-value" id="ov-missing-rating">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Avg words/review</div>
+            <div class="metric-value" id="ov-avg-words">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Avg chars/review</div>
+            <div class="metric-value" id="ov-avg-chars">—</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card part-card" id="part-1">
+        <h2 class="part-title">Part 2: Raw Data Analysis</h2>
+        <p class="part-subtitle">Overview, rating distribution, and raw stop words</p>
+      </section>
+
+      <section class="card" id="part-1-1">
+        <h3>2.1 Dataset Overview (per-rating length)</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Average word and character counts per rating (1★–5★).
+        </h4>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Rating</th>
+              <th>Avg word_count</th>
+              <th>Avg char_count</th>
+            </tr>
+          </thead>
+          <tbody id="per-rating-tbody">
+            <tr><td colspan="3">Loading...</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card" id="part-1-2">
+        <h3>2.2 Sample Reviews</h3>
+
+        <!-- Rating 1★ -->
+        <div class="sample-rating-group">
+          <div class="sample-rating-header">
+            <span class="star-badge star-1">1★ Terrible</span>
+          </div>
+          <div class="review-cards">
+            <div class="review-card">
+              <div class="review-card-label">Sample 1:</div>
+              <p class="review-text">horrible customer service hotel stay february 3rd 4th 2007 — my friend picked hotel monaco appealing website online package included champagne late checkout 3 free valet gift spa weekend. friend checked room hours earlier came later, pulled valet young man just stood, asked valet open said, pull bags didn't offer help, got garment bag suitcase came car key room number says not valet, car park car street pull, left key working asked valet park car gets. went room fine bottle champagne oil lotion gift spa, dressed went came got bed noticed blood drops pillows sheets pillows, disgusted just unbelievable. called desk sent somebody 20 minutes later, swapped sheets left apologizing. sunday morning called desk speak management sheets aggravated rude.</p>
+            </div>
+            <div class="review-card">
+              <div class="review-card-label">Sample 2:</div>
+              <p class="review-text">noise airconditioner — a standard. arranged stay travel agency unfortunately warwick seattle hotel dissapointment trip. 3 night stay warwick changed 3 rooms. starting minute stay hotel personnel didn't make feel like guest like intruder, reluctant help solve complaints. hotel right downtown 5 minutes really good restaurants like good thing. availability room offered 2nd floor window directly opening car parking level, changed room. 3 rooms loud sound coming air conditioner/heating — unbelievable hotel. hotel personnel told standard noise rooms. tried avoid using night order sleep possible watching tv loudly.</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="rating-divider">
+
+        <!-- Rating 2★ -->
+        <div class="sample-rating-group">
+          <div class="sample-rating-header">
+            <span class="star-badge star-2">2★ Poor</span>
+          </div>
+          <div class="review-cards">
+            <div class="review-card">
+              <div class="review-card-label">Sample 1:</div>
+              <p class="review-text">ok nothing special — charge diamond member hilton decided chain shot 20th anniversary seattle. start booked suite paid extra website description not. suite bedroom bathroom standard hotel room. took printed reservation desk showed said things like tv couch etc desk clerk told oh mixed suites description kimpton website sorry free breakfast. got kidding.</p>
+            </div>
+            <div class="review-card">
+              <div class="review-card-label">Sample 2:</div>
+              <p class="review-text">poor value — stayed monaco seattle july. nice hotel priced 100–150 night not. hotel takes beating quotient. experience simply average, nothing exceptional paying 300+. wife stayed nicest suites 200/night felt like overpaying. best advice shop. quality-wise league average marriott nice best western.</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="rating-divider">
+
+        <!-- Rating 3★ -->
+        <div class="sample-rating-group">
+          <div class="sample-rating-header">
+            <span class="star-badge star-3">3★ Average</span>
+          </div>
+          <div class="review-cards">
+            <div class="review-card">
+              <div class="review-card-label">Sample 1:</div>
+              <p class="review-text">nice rooms not 4* experience — hotel monaco seattle good hotel but not 4* level. positives: large bathroom, mediterranean suite comfortable bed/pillows, attentive housekeeping staff. negatives: ac unit malfunctioned stay, desk disorganized — missed 3 separate wakeup calls, concierge busy hard to reach, did not provide guidance for special requests.</p>
+            </div>
+            <div class="review-card">
+              <div class="review-card-label">Sample 2:</div>
+              <p class="review-text">nice hotel not nice staff — hotel lovely but staff quite rude. bellhop desk clerk going way make things difficult. waited forever check, heavy bags no help getting through double doors room. worst desk clerk checking — tap tap tap — car waited pick 20 minutes.</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="rating-divider">
+
+        <!-- Rating 4★ -->
+        <div class="sample-rating-group">
+          <div class="sample-rating-header">
+            <span class="star-badge star-4">4★ Good</span>
+          </div>
+          <div class="review-cards">
+            <div class="review-card">
+              <div class="review-card-label">Sample 1:</div>
+              <p class="review-text">nice hotel expensive parking — got good deal stay hotel anniversary. arrived late evening took advice previous reviews did valet parking. check quick easy. little disappointed non-existent view room — room clean nice size. bed comfortable woke stiff neck high pillows. not soundproof like — heard music room night morning loud bangs doors opening closing, hear people talking hallway.</p>
+            </div>
+            <div class="review-card">
+              <div class="review-card-label">Sample 2:</div>
+              <p class="review-text">excellent staff — housekeeping quality hotel. staff make feel home. experienced exceptional service desk staff, concierge, door men. maid service needs work — maid failed tuck sheets foot bed. staff quickly resolved soiled sheets issue. received excellent advice concierge regarding restaurants area. happy hour wine tasting nice touch.</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="rating-divider">
+
+        <!-- Rating 5★ -->
+        <div class="sample-rating-group">
+          <div class="sample-rating-header">
+            <span class="star-badge star-5">5★ Excellent</span>
+          </div>
+          <div class="review-cards">
+            <div class="review-card">
+              <div class="review-card-label">Sample 1:</div>
+              <p class="review-text">unique, great stay — wonderful time hotel monaco. location excellent short stroll main downtown shopping area. pet friendly room showed no signs animal hair smells. monaco suite sleeping area big striped curtains pulled closed nice touch felt cosy. goldfish named brandi enjoyed. did not partake free wine coffee/tea service lobby thought great feature. great staff friendly.</p>
+            </div>
+            <div class="review-card">
+              <div class="review-card-label">Sample 2:</div>
+              <p class="review-text">great stay — went seahawk game awesome. downfall view building did not complain. room huge staff helpful. booked hotels website seahawk package. no charge parking got voucher taxi. right christmas wonderful lights. hotel maintained foyer awesome. wine tasting available evening. best dog — taking st. bernard time family.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="part-1-3">
+        <h3>2.3 Category Distribution (Ratings)</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Counts and percentages for each rating class.
+        </h4>
+
+        <div class="grid-2">
+          <div>
+            <table class="table">
+              <thead>
+                <tr><th>Rating</th><th>Count</th><th>%</th></tr>
+              </thead>
+              <tbody id="rating-table-tbody">
+                <tr><td colspan="3">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="plot" id="fig-rating-pie"></div>
+        </div>
+      </section>
+
+      <section class="card" id="part-1-4">
+        <h3>2.4 Stop Words Analysis (Raw Data)</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Most frequent stop words in the raw corpus (before cleaning).
+        </h4>
+        <div class="grid-2" style="margin-bottom: 12px">
+          <div class="metric">
+            <div class="metric-label">Total words</div>
+            <div class="metric-value" id="total-words">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Total stopwords</div>
+            <div class="metric-value" id="total-stop">—</div>
+          </div>
+        </div>
+
+        <div class="plot" id="fig-stopwords"></div>
+      </section>
+
+      <section class="card part-card" id="part-2">
+        <h2 class="part-title">Part 2: Stopwords Removed Analysis</h2>
+        <p class="part-subtitle">Cleaned text + frequency, TF-IDF, bigrams</p>
+      </section>
+
+      <section class="card" id="part-2-1">
+        <h3>3.1 Preprocessing Data</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Vocabulary size before vs after cleaning.
+        </h4>
+
+        <div class="grid-4">
+          <div class="metric">
+            <div class="metric-label">Vocab before</div>
+            <div class="metric-value" id="vocab-before">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Vocab after</div>
+            <div class="metric-value" id="vocab-after">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Reduction</div>
+            <div class="metric-value" id="vocab-reduction">—</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="part-2-2">
+        <h3>3.2 Vocabulary Richness</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Total words and unique vocab size per rating, on cleaned text.
+        </h4>
+
+        <div class="plot" id="fig-vocab-richness"></div>
+
+        <table class="table" style="margin-top: 12px">
+          <thead>
+            <tr><th>Rating</th><th>Total Words</th><th>Unique Words</th></tr>
+          </thead>
+          <tbody id="vocab-table-tbody">
+            <tr><td colspan="3">Loading...</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card" id="part-2-3">
+        <h3>3.3 Top 50 Words Visualization</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Top 50 words per rating level (1★–5★).
+        </h4>
+        <div id="fig-top50-container"></div>
+      </section>
+
+      <section class="card" id="part-2-4">
+        <h3>3.4 TF-IDF Top Terms</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Top 20 discriminative TF-IDF terms per rating.
+        </h4>
+        <div id="fig-tfidf-container"></div>
+      </section>
+
+      <section class="card" id="part-2-5">
+        <h3>3.5 N-gram Analysis (Bigrams)</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Top 20 bigrams per rating on cleaned text.
+        </h4>
+        <div id="fig-bigrams-container"></div>
+      </section>
+
+      <section class="card part-card" id="part-3">
+        <h2 class="part-title">Part 4: Category Similarity Analysis</h2>
+        <p class="part-subtitle">Cosine similarity of TF-IDF vectors (rating × rating)</p>
+      </section>
+
+      <section class="card" id="part-3-heatmap">
+        <h3>Similarity Matrix</h3>
+        <div class="plot" id="fig-similarity"></div>
+
+        <details class="details" style="margin-top: 12px">
+          <summary>Matrix values (rounded)</summary>
+          <div class="details-body">
+            <table class="table" id="sim-matrix-table">
+              <thead id="sim-matrix-thead"></thead>
+              <tbody id="sim-matrix-tbody"></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section class="card part-card" id="part-4">
+        <h2 class="part-title">Part 5: Key Insight</h2>
+        <p class="part-subtitle">Summary extracted from the notebook</p>
+      </section>
+
+      <section class="card" id="part-4-insights">
+        <div class="prose" id="insights-container">Loading...</div>
+      </section>
+    </main>
+
+    <script>
+      // ──────────────────────────────────────────────
+      // Utility
+      // ──────────────────────────────────────────────
+      async function loadJSON(path) {
+        const r = await fetch(path);
+        if (!r.ok) throw new Error(`Failed: ${path} → ${r.status}`);
+        return r.json();
+      }
+
+      function fmt(n) {
+        if (typeof n === 'number') return Number.isInteger(n) ? n.toLocaleString() : n.toFixed(2);
+        return n;
+      }
+
+      function renderPlotly(divId, jsonPath) {
+        return loadJSON(jsonPath).then(spec => {
+          Plotly.react(divId, spec.data, spec.layout, { responsive: true });
+        }).catch(err => {
+          document.getElementById(divId).textContent = 'Chart unavailable';
+          console.warn(err);
+        });
+      }
+
+      // ──────────────────────────────────────────────
+      // Bootstrap
+      // ──────────────────────────────────────────────
+      (async () => {
+        try {
+          // ── Overview ──
+          const ov = await loadJSON('./data/overview.json');
+          document.getElementById('ov-total-reviews').textContent = ov.total_reviews.toLocaleString();
+          document.getElementById('ov-total-features').textContent = ov.total_features;
+          document.getElementById('ov-rating-range').textContent = `${ov.rating_min}–${ov.rating_max}`;
+          document.getElementById('ov-duplicates').textContent = ov.duplicates;
+          document.getElementById('ov-missing-review').textContent = ov.missing_review;
+          document.getElementById('ov-missing-rating').textContent = ov.missing_rating;
+          document.getElementById('ov-avg-words').textContent = ov.avg_words.toFixed(2);
+          document.getElementById('ov-avg-chars').textContent = ov.avg_chars.toFixed(2);
+        } catch (e) { console.warn('overview:', e); }
+
+        try {
+          // ── Per-rating stats table ──
+          const perRating = await loadJSON('./data/per_rating_stats.json');
+          document.getElementById('per-rating-tbody').innerHTML = perRating.map(r =>
+            `<tr><td>${r.Rating}</td><td>${r.word_count}</td><td>${r.char_count}</td></tr>`
+          ).join('');
+        } catch (e) { console.warn('per_rating:', e); }
+
+        try {
+          // ── Rating distribution table ──
+          const ratingTable = await loadJSON('./data/rating_table.json');
+          document.getElementById('rating-table-tbody').innerHTML = ratingTable.map(r =>
+            `<tr><td>${r.Rating}★</td><td>${Number(r.Count).toLocaleString()}</td><td>${r.Percent}</td></tr>`
+          ).join('');
+        } catch (e) { console.warn('rating_table:', e); }
+
+        // ── Figures ──
+        renderPlotly('fig-rating-pie', './data/fig_rating_pie.json');
+
+        try {
+          const ts = await loadJSON('./data/text_stats.json');
+          document.getElementById('total-words').textContent = ts.total_words.toLocaleString();
+          document.getElementById('total-stop').textContent = ts.total_stop.toLocaleString();
+        } catch (e) { console.warn('text_stats:', e); }
+
+        renderPlotly('fig-stopwords', './data/fig_stopwords.json');
+
+        try {
+          const vs = await loadJSON('./data/vocab_sizes.json');
+          document.getElementById('vocab-before').textContent = vs.vocab_before.toLocaleString();
+          document.getElementById('vocab-after').textContent = vs.vocab_after.toLocaleString();
+          document.getElementById('vocab-reduction').textContent = vs.vocab_reduction_pct.toFixed(2) + '%';
+        } catch (e) { console.warn('vocab_sizes:', e); }
+
+        renderPlotly('fig-vocab-richness', './data/fig_vocab_richness.json');
+
+        try {
+          // ── Vocab table ──
+          const vocabTable = await loadJSON('./data/vocab_table.json');
+          document.getElementById('vocab-table-tbody').innerHTML = vocabTable.map(r =>
+            `<tr><td>${r.Rating}</td><td>${Number(r['Total Words']).toLocaleString()}</td><td>${Number(r['Unique Words']).toLocaleString()}</td></tr>`
+          ).join('');
+        } catch (e) { console.warn('vocab_table:', e); }
+
+        // ── Per-rating figures (top50, tfidf, bigrams) ──
+        const RATINGS = [1, 2, 3, 4, 5];
+
+        const top50Container = document.getElementById('fig-top50-container');
+        const tfidfContainer = document.getElementById('fig-tfidf-container');
+        const bigramsContainer = document.getElementById('fig-bigrams-container');
+
+        RATINGS.forEach(r => {
+          // Top 50
+          const d50 = document.createElement('div');
+          d50.className = 'card'; d50.style.margin = '12px 0';
+          d50.innerHTML = `<h3 style="margin-bottom:6px">Rating ${r}★</h3><div class="plot" id="fig-top50-${r}"></div>`;
+          top50Container.appendChild(d50);
+          renderPlotly(`fig-top50-${r}`, `./data/fig_top50_${r}.json`);
+
+          // TF-IDF
+          const dTfidf = document.createElement('div');
+          dTfidf.className = 'card'; dTfidf.style.margin = '12px 0';
+          dTfidf.innerHTML = `<h3 style="margin-bottom:6px">Rating ${r}★</h3><div class="plot" id="fig-tfidf-${r}"></div>`;
+          tfidfContainer.appendChild(dTfidf);
+          renderPlotly(`fig-tfidf-${r}`, `./data/fig_tfidf_${r}.json`);
+
+          // Bigrams
+          const dBigrams = document.createElement('div');
+          dBigrams.className = 'card'; dBigrams.style.margin = '12px 0';
+          dBigrams.innerHTML = `<h3 style="margin-bottom:6px">Rating ${r}★</h3><div class="plot" id="fig-bigrams-${r}"></div>`;
+          bigramsContainer.appendChild(dBigrams);
+          renderPlotly(`fig-bigrams-${r}`, `./data/fig_bigrams_${r}.json`);
+        });
+
+        // ── Similarity ──
+        renderPlotly('fig-similarity', './data/fig_similarity.json');
+
+        try {
+          const simData = await loadJSON('./data/sim_matrix.json');
+          const labels = simData.labels;
+          const matrix = simData.matrix;
+
+          document.getElementById('sim-matrix-thead').innerHTML =
+            `<tr><th></th>${labels.map(l => `<th>${l}</th>`).join('')}</tr>`;
+          document.getElementById('sim-matrix-tbody').innerHTML = labels.map((l, i) =>
+            `<tr><th>${l}</th>${matrix[i].map(v => `<td>${v.toFixed(4)}</td>`).join('')}</tr>`
+          ).join('');
+        } catch (e) { console.warn('sim_matrix:', e); }
+
+        // ── Insights ──
+        try {
+          const ins = await loadJSON('./data/insights.json');
+          document.getElementById('insights-container').innerHTML = ins.html;
+        } catch (e) { console.warn('insights:', e); }
+
+      })();
+    </script>
+  </body>
+</html>

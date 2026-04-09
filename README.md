@@ -1,80 +1,48 @@
 
 # CO3135 — Programming for Artificial Intelligence and Data Science
 
-This repository contains a small **FastAPI** web app that presents **EDA (Exploratory Data Analysis)** results for:
+This repository contains a static web application that presents **EDA (Exploratory Data Analysis)** results for:
 
 - **Tabular dataset**: `netflix_titles.csv` (Netflix titles metadata)
- - **Image dataset**: `image_statistic.csv` + related CSVs (image / bbox / mask / quality stats)
-- 
-The UI is rendered with **Jinja2 templates** and charts are generated with **Plotly**.
+- **Text dataset**: `email_spam.csv` (Email spam classification)
+- **Image dataset**: CUB / Image statistics (bounding boxes, masks, quality metrics)
+
+The UI has been migrated from a FastAPI back-end to a fully **static structure** that can be hosted directly via GitHub Pages or any static HTTP server. All data and Plotly charts are dynamically loaded as static JSON files via client-side JavaScript.
 
 ## What’s inside
 
-- `app/main.py` — FastAPI entrypoint and routes
-- `app/templates/` — HTML templates (landing page + Assignment 1 pages)
-- `app/static/` — CSS
-- `app/templates/assignment1/EDA/Tabular/eda.py` — tabular EDA logic (Netflix)
-- `app/templates/assignment1/EDA/Text/eda.py` — text EDA logic (email spam)
+- `docs/` — Contains all static HTML, CSS, JS, and JSON data files ready for deployment.
+  - `docs/index.html` — Home landing page
+  - `docs/assignment1/index.html` — Assignment 1 landing page
+  - `docs/assignment1/text/index.html` — Text EDA results
+  - `docs/assignment1/tabular/index.html` — Tabular EDA results
+  - `docs/assignment1/image/index.html` — Image EDA results
+  - `docs/static/` — CSS styles, fonts, and global assets
+- `export_static.py` — Python script used for generation of static site data (if needed for rebuilding).
 
-## Requirements
+## Hosting locally
 
-- Python 3.10+ (recommended)
-
-Install dependencies from `requirements.txt`.
-
-## Setup
-
-Create and activate a virtual environment, then install dependencies:
+To view the site locally, you do not need FastAPI. You can use any static server. For example, using Python's built-in `http.server`:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+cd docs
+python3 -m http.server 8000
 ```
 
-## Run the web app
+Then open your browser to:
 
-Start the server (from the repository root):
+- Home: http://localhost:8000/
+- Assignment 1 landing: http://localhost:8000/assignment1/
+- Text EDA: http://localhost:8000/assignment1/text/
+- Tabular EDA: http://localhost:8000/assignment1/tabular/
+- Image EDA: http://localhost:8000/assignment1/image/
 
-```bash
-uvicorn app.main:app --reload
-```
+## Deployment
 
-Then open:
+The `docs` folder is completely static and can be deployed straightforwardly via [GitHub Pages](https://pages.github.com/). 
+Go to the repository settings, select **Pages**, and choose the **`docs`** folder on your main branch as the source.
 
-- Home: http://127.0.0.1:8000/
-- Assignment 1 landing: http://127.0.0.1:8000/assignment1
-- Text EDA: http://127.0.0.1:8000/assignment1/text
-- Tabular EDA: http://127.0.0.1:8000/assignment1/tabular
-
-## Datasets
-
-### Netflix (tabular)
-
-Create or export the tabular dataset `netflix_titles.csv` in this location:  `app/templates/assignment1/EDA/Tabular/netflix_titles.csv`
-
-### Email spam (text)
-
-Create or export the text dataset `email_spam.csv` in this location: `app/templates/assignment1/EDA/Text/email_spam.csv`
-
-### Image (image statistics)
-
-Place the image-related CSV files in: `app/templates/assignment1/EDA/Image/csv/`.
-Common files used by the Image EDA include:
-
-- `image_statistic.csv` (primary image metadata)
-- `bbox_statistic.csv` (bounding box records)
-- `mask_statistics.csv`, `quality_metrics.csv`, `pixel_distribution.csv`, `shape_distribution.csv`
-- `segmentation_boundary_quality_metric.csv`, `spatial_distribution_analytics.csv`, `tsne_embeddings.csv`, `similarity_matrix.csv`
-
-Optional directories read by the Image EDA template:
-
-- `app/templates/assignment1/EDA/Image/parts/` — files representing part locations
-- `app/templates/assignment1/EDA/Image/attributes/` — binary attribute files
- - `app/templates/assignment1/EDA/Image/eda.py` — image EDA logic (CUB / image statistics)
- 
 ## Notes
 
-- Plotly is rendered without bundling Plotly.js in every figure (`include_plotlyjs=False`). The page template is expected to include Plotly.js once globally.
-- If you move datasets, update the CSV path or keep a copy in the repository root.
-
+- Plotly charts are generated client-side by fetching JSON data and rendering them dynamically without a heavy backend.
+- Ensure any large generated static JSON files are tracked or regenerated using the `export_static.py` pipeline if source datasets have changed.

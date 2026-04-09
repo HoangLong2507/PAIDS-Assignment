@@ -1,0 +1,1 @@
+{"total_images": 11788, "total_breeds": 200, "splits": {"test": 5794, "train": 4800, "val": 1194}, "part_locations": 15, "binary_attributes": 312, "bounding_box": 1, "avg_width": 467.89, "avg_height": 386.03, "avg_aspect_ratio": 1.2575, "avg_file_size_kb": 95.32, "avg_brightness": 124.38, "avg_contrast": 45.41, "avg_sharpness": 1375.2}

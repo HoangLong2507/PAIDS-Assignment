@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tabular EDA — Netflix Movies and TV Shows</title>
+
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../../static/assignment1.styles.css" />
+  </head>
+
+  <body>
+    <header class="topbar">
+      <div class="container nav">
+        <a class="brand" href="#">
+          <span class="brand-badge" aria-hidden="true"></span>
+          <span class="brand-text">
+            <span class="brand-title">Tabular EDA</span>
+          </span>
+        </a>
+
+        <nav class="toc">
+          <a href="#part-1">Part 1</a>
+          <a href="#part-2">Part 2</a>
+          <a href="#part-3">Part 3</a>
+          <a href="#part-4">Part 4</a>
+          <a href="#part-5">Part 5</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="return-btn">
+        <a class="btn" href="../" style="text-decoration: none; color: black">← Back</a>
+      </div>
+
+      <section class="card part-card" id="part-1">
+        <h2 class="part-title">Part 1: Data Understanding</h2>
+        <p class="part-subtitle">Initial overview and data quality check</p>
+      </section>
+
+      <section class="card" id="overview">
+        <h3>📊 1. Dataset Overview</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          In this section, we take a first look at the structure of the dataset.
+        </h4>
+
+        <div class="grid-4">
+          <div class="metric">
+            <div class="metric-label">Total Samples</div>
+            <div class="metric-value" id="ov-total-samples">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Total Features</div>
+            <div class="metric-value" id="ov-total-features">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Numerical Features</div>
+            <div class="metric-value" id="ov-numerical-features">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Categorical Features</div>
+            <div class="metric-value" id="ov-categorical-features">—</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="missing">
+        <h3>🔍 2. Missing Values Analysis</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Missing data is a common issue that can bias analysis results.
+        </h4>
+
+        <div class="grid-2">
+          <div>
+            <table class="table">
+              <thead>
+                <tr><th>Feature</th><th>Count</th><th>Percent (%)</th></tr>
+              </thead>
+              <tbody id="missing-table-tbody">
+                <tr><td colspan="3">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="plot" id="fig-missing"></div>
+        </div>
+      </section>
+
+      <section class="card part-card" id="part-2">
+        <h2 class="part-title">Part 2: Feature Distribution</h2>
+        <p class="part-subtitle">Analyzing numerical and categorical attributes</p>
+      </section>
+
+      <section class="card" id="numerical">
+        <h3>📈 3. Numerical Features Distribution</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          We analyze quantitative variables such as the release year.
+        </h4>
+
+        <div class="plot" id="fig-release-year"></div>
+
+        <div class="grid-4">
+          <div class="metric">
+            <div class="metric-label">Mean</div>
+            <div class="metric-value" id="rel-mean">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Median</div>
+            <div class="metric-value" id="rel-median">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Std</div>
+            <div class="metric-value" id="rel-std">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Min / Max</div>
+            <div class="metric-value" id="rel-minmax">—</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="categorical">
+        <h3>📊 4. Categorical Features Distribution</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          This section focuses on qualitative information such as Country, Director, Cast, and Content Rating.
+        </h4>
+        <div id="cat-payload-container"></div>
+      </section>
+
+      <section class="card part-card" id="part-3">
+        <h2 class="part-title">Part 3: Statistical Analysis</h2>
+        <p class="part-subtitle">Target variables, correlations, and outliers</p>
+      </section>
+
+      <section class="card" id="target">
+        <h3>🎯 5. Target Variable Distribution</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          The target variable here is 'Content Type', divided into Movies and TV Shows.
+        </h4>
+
+        <div class="grid-2">
+          <div class="plot" id="fig-target"></div>
+          <div>
+            <table class="table">
+              <thead>
+                <tr><th>Type</th><th>Count</th><th>%</th></tr>
+              </thead>
+              <tbody id="target-dist-tbody">
+                <tr><td colspan="3">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="corr">
+        <h3>🔗 6. Correlation Analysis</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          We examine the relationship between numerical variables.
+        </h4>
+        <div class="plot" id="fig-corr"></div>
+        <p id="fig-corr-none" style="display:none">Not enough numerical features for correlation analysis.</p>
+
+        <details class="details" style="margin-top: 12px" id="high-corrs-section">
+          <summary>High correlations (|r| &gt; 0.5)</summary>
+          <div class="details-body">
+            <table class="table" id="high-corrs-table">
+              <thead><tr><th>Feature A</th><th>Feature B</th><th>r</th></tr></thead>
+              <tbody id="high-corrs-tbody"><tr><td colspan="3">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section class="card" id="outliers">
+        <h3>📦 7. Outlier Detection (IQR)</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          Using the IQR method and Box Plots, we identify abnormal values.
+        </h4>
+
+        <div class="grid-2">
+          <div class="plot" id="fig-outlier"></div>
+          <div>
+            <div class="grid-2">
+              <div class="metric">
+                <div class="metric-label">Lower Bound</div>
+                <div class="metric-value" id="out-lower">—</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Upper Bound</div>
+                <div class="metric-value" id="out-upper">—</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label"># Outliers</div>
+                <div class="metric-value" id="out-count">—</div>
+                <div class="metric-foot" id="out-pct">—</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Outlier Range</div>
+                <div class="metric-value" id="out-range">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card part-card" id="part-4">
+        <h2 class="part-title">Part 4: Relationships &amp; Samples</h2>
+        <p class="part-subtitle">Multivariate analysis and raw data inspection</p>
+      </section>
+
+      <section class="card" id="relations">
+        <h3>🎯 8. Relationship between Target and Other Features</h3>
+        <h4 style="margin-top: 8px; color: var(--muted); font-size: 14px">
+          We examine how the content type varies across different countries, ratings, or directors.
+        </h4>
+        <div id="rel-figs-container"></div>
+      </section>
+
+      <section class="card" id="samples">
+        <h3>📝 9. Sample Data Rows</h3>
+        <div style="display: flex; flex-direction: column; gap: 24px">
+          <div>
+            <h4 style="margin: 0 0 10px">Movies Samples</h4>
+            <div class="table-wrap" id="movie-samples-wrap"></div>
+          </div>
+          <div>
+            <h4 style="margin: 0 0 10px">TV Shows Samples</h4>
+            <div class="table-wrap" id="tvshow-samples-wrap"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card part-card" id="part-5">
+        <h2 class="part-title">Part 5: Final Insights</h2>
+        <p class="part-subtitle">Summary of key findings and recommendations</p>
+      </section>
+
+      <section class="card" id="insights">
+        <h3>💡 10. Key Insights</h3>
+        <ol>
+          <li><strong>Content dominance:</strong> Movies represent ~70% of the dataset.</li>
+          <li><strong>Data quality:</strong> Significant missing data in <code>director</code>.</li>
+          <li><strong>Recency:</strong> Most content was released after 2015, with outliers representing older classics.</li>
+          <li><strong>Ratings:</strong> TV-MA is a frequent rating, targeted toward mature audiences.</li>
+          <li><strong>Production:</strong> The USA is a leading country in content production.</li>
+        </ol>
+
+        <div style="margin-top: 12px">
+          <h4 style="margin: 6px 0">1. Content Strategy &amp; Distribution</h4>
+          <ul>
+            <li><strong>Movies Dominate:</strong> Netflix's catalog is heavily skewed toward Movies, which make up nearly 70% of the platform's offerings, compared to TV Shows at 30%.</li>
+            <li><strong>Top Producing Nations:</strong> The United States is the undisputed leader in content volume, followed by India and the United Kingdom.</li>
+            <li><strong>Regional Content Preferences:</strong> While the US produces a balanced mix, countries like India and Hong Kong are overwhelmingly focused on Movies (&gt;90%). Conversely, countries like South Korea and Japan show a much stronger emphasis on TV Shows compared to the global average.</li>
+          </ul>
+
+          <h4 style="margin: 6px 0">2. Temporal &amp; Release Trends</h4>
+          <ul>
+            <li><strong>Recent Growth Spurt:</strong> The vast majority of the content was released in the last decade (post-2010), reflecting Netflix's aggressive acquisition and original content production strategy.</li>
+            <li><strong>Outliers in Antiquity:</strong> There are notable outliers dating back to the 1920s through the 1970s, indicating a curated but small selection of classic cinema.</li>
+          </ul>
+
+          <h4 style="margin: 6px 0">3. Audience Targeting (Ratings)</h4>
+          <ul>
+            <li><strong>Mature Audience Focus:</strong> The most frequent content ratings are TV-MA and TV-14, indicating that Netflix strongly targets adult and mature teen demographics.</li>
+          </ul>
+
+          <h4 style="margin: 6px 0">4. Data Quality &amp; Imbalance</h4>
+          <ul>
+            <li><strong>Missing Information:</strong> Fields like <code>director</code>, <code>cast</code>, and <code>country</code> contain meaningful proportions of missing data.</li>
+            <li><strong>Dataset Balance:</strong> The 70/30 split between Movies and TV Shows presents a mild to moderate class imbalance.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      async function loadJSON(path) {
+        const r = await fetch(path);
+        if (!r.ok) throw new Error(`Failed: ${path} → ${r.status}`);
+        return r.json();
+      }
+
+      function renderPlotly(divId, jsonPath) {
+        return loadJSON(jsonPath).then(spec => {
+          if (!spec) { document.getElementById(divId).textContent = 'N/A'; return; }
+          Plotly.react(divId, spec.data, spec.layout, { responsive: true });
+        }).catch(err => {
+          const el = document.getElementById(divId);
+          if (el) el.textContent = 'Chart unavailable';
+          console.warn(err);
+        });
+      }
+
+      function buildTable(cols, rows) {
+        return `<table class="table">
+          <thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+          <tbody>${rows.map(r => `<tr>${r.map(v => `<td>${v === null || v === undefined ? '' : v}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table>`;
+      }
+
+      (async () => {
+        // Overview
+        try {
+          const ov = await loadJSON('./data/overview.json');
+          document.getElementById('ov-total-samples').textContent = Number(ov.total_samples).toLocaleString();
+          document.getElementById('ov-total-features').textContent = ov.total_features;
+          document.getElementById('ov-numerical-features').textContent = ov.numerical_features;
+          document.getElementById('ov-categorical-features').textContent = ov.categorical_features;
+        } catch (e) { console.warn('overview:', e); }
+
+        // Missing
+        try {
+          const mt = await loadJSON('./data/missing_table.json');
+          document.getElementById('missing-table-tbody').innerHTML = mt.map(r =>
+            `<tr><td>${r.Feature}</td><td>${Number(r.Count).toLocaleString()}</td><td>${r['Percent (%)']}</td></tr>`
+          ).join('');
+        } catch (e) { console.warn('missing_table:', e); }
+        renderPlotly('fig-missing', './data/fig_missing.json');
+
+        // Release year
+        renderPlotly('fig-release-year', './data/fig_release_year.json');
+        try {
+          const rs = await loadJSON('./data/release_stats.json');
+          document.getElementById('rel-mean').textContent = rs.mean.toFixed(2);
+          document.getElementById('rel-median').textContent = rs.median.toFixed(2);
+          document.getElementById('rel-std').textContent = rs.std.toFixed(2);
+          document.getElementById('rel-minmax').textContent = `${Math.round(rs.min)} / ${Math.round(rs.max)}`;
+        } catch (e) { console.warn('release_stats:', e); }
+
+        // Categorical
+        try {
+          const cp = await loadJSON('./data/cat_payload.json');
+          const container = document.getElementById('cat-payload-container');
+          for (const [feature, payload] of Object.entries(cp)) {
+            const title = feature.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            const divId = `cat-fig-${feature.replace(/[^a-z0-9]/gi, '_')}`;
+            const card = document.createElement('div');
+            card.className = 'card'; card.style.margin = '12px 0';
+            const statsRows = (payload.stats.top10 || []).map(r =>
+              `<tr><td>${r.category}</td><td>${Number(r.count).toLocaleString()}</td><td>${r.pct.toFixed(2)}</td></tr>`
+            ).join('');
+            card.innerHTML = `
+              <h3 style="margin-bottom:6px">${title}</h3>
+              <div class="plot" id="${divId}"></div>
+              <div style="height:12px"></div>
+              <table class="table">
+                <thead><tr><th>Top categories</th><th>Count</th><th>%</th></tr></thead>
+                <tbody>${statsRows}</tbody>
+              </table>`;
+            container.appendChild(card);
+            Plotly.react(divId, payload.fig.data, payload.fig.layout, { responsive: true });
+          }
+        } catch (e) { console.warn('cat_payload:', e); }
+
+        // Target pie
+        renderPlotly('fig-target', './data/fig_target.json');
+        try {
+          const td = await loadJSON('./data/target_dist.json');
+          document.getElementById('target-dist-tbody').innerHTML = td.map(r =>
+            `<tr><td>${r.label}</td><td>${Number(r.count).toLocaleString()}</td><td>${r.pct.toFixed(2)}</td></tr>`
+          ).join('');
+        } catch (e) { console.warn('target_dist:', e); }
+
+        // Correlation
+        try {
+          const corrSpec = await loadJSON('./data/fig_corr.json');
+          if (corrSpec) {
+            Plotly.react('fig-corr', corrSpec.data, corrSpec.layout, { responsive: true });
+          } else {
+            document.getElementById('fig-corr').style.display = 'none';
+            document.getElementById('fig-corr-none').style.display = 'block';
+            document.getElementById('high-corrs-section').style.display = 'none';
+          }
+        } catch (e) { console.warn('fig_corr:', e); }
+
+        try {
+          const hc = await loadJSON('./data/high_corrs.json');
+          if (!hc.high_corrs || hc.high_corrs.length === 0) {
+            document.getElementById('high-corrs-tbody').innerHTML = '<tr><td colspan="3">None found in this dataset.</td></tr>';
+          } else {
+            document.getElementById('high-corrs-tbody').innerHTML = hc.high_corrs.map(r =>
+              `<tr><td>${r.a}</td><td>${r.b}</td><td>${r.r.toFixed(3)}</td></tr>`
+            ).join('');
+          }
+        } catch (e) { console.warn('high_corrs:', e); }
+
+        // Outlier
+        renderPlotly('fig-outlier', './data/fig_outlier.json');
+        try {
+          const os = await loadJSON('./data/outlier_stats.json');
+          document.getElementById('out-lower').textContent = os.lower_bound.toFixed(2);
+          document.getElementById('out-upper').textContent = os.upper_bound.toFixed(2);
+          document.getElementById('out-count').textContent = Number(os.outlier_count).toLocaleString();
+          document.getElementById('out-pct').textContent = os.outlier_pct.toFixed(2) + '%';
+          document.getElementById('out-range').textContent =
+            os.min_outlier == null ? 'None' : `${Math.round(os.min_outlier)} - ${Math.round(os.max_outlier)}`;
+        } catch (e) { console.warn('outlier_stats:', e); }
+
+        // Relationships
+        try {
+          const rf = await loadJSON('./data/rel_figs.json');
+          const container = document.getElementById('rel-figs-container');
+          for (const [feature, payload] of Object.entries(rf)) {
+            const title = feature.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            const divId = `rel-fig-${feature.replace(/[^a-z0-9]/gi, '_')}`;
+            const card = document.createElement('div');
+            card.className = 'card'; card.style.margin = '12px 0';
+            const statsRows = (payload.stats.top_rows || []).map(r =>
+              `<tr><td>${r.category}</td><td>${r.movie_pct.toFixed(2)}</td><td>${r.tv_pct.toFixed(2)}</td><td>${r.total_pct.toFixed(2)}</td></tr>`
+            ).join('');
+            card.innerHTML = `
+              <h3 style="margin-bottom:6px">${title}</h3>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div class="plot" id="${divId}"></div>
+                <div>
+                  <p style="font-weight:600">${title} with highest Movie rate:</p>
+                  <table class="table">
+                    <thead><tr><th>Category</th><th>Movie (%)</th><th>TV Show (%)</th><th>Total (%)</th></tr></thead>
+                    <tbody>${statsRows}</tbody>
+                  </table>
+                </div>
+              </div>`;
+            container.appendChild(card);
+            Plotly.react(divId, payload.fig.data, payload.fig.layout, { responsive: true });
+          }
+        } catch (e) { console.warn('rel_figs:', e); }
+
+        // Samples
+        try {
+          const samples = await loadJSON('./data/samples.json');
+          function renderSampleTable(data, containerId) {
+            const wrap = document.getElementById(containerId);
+            if (!data || data.length === 0) { wrap.textContent = 'No samples available.'; return; }
+            const cols = Object.keys(data[0]).filter(c => c !== 'date_added_parsed');
+            wrap.innerHTML = `<table class="table">
+              <thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+              <tbody>${data.map(r => `<tr>${cols.map(c => `<td>${r[c] === null || r[c] === undefined ? '' : r[c]}</td>`).join('')}</tr>`).join('')}</tbody>
+            </table>`;
+          }
+          renderSampleTable(samples['Movie'] || [], 'movie-samples-wrap');
+          renderSampleTable(samples['TV Show'] || [], 'tvshow-samples-wrap');
+        } catch (e) { console.warn('samples:', e); }
+      })();
+    </script>
+  </body>
+</html>
