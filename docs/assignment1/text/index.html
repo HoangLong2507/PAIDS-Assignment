@@ -52,10 +52,6 @@
             <div class="metric-label">Total Reviews</div>
             <div class="metric-value" id="ov-total-reviews">—</div>
           </div>
-          <div class="metric" style="display: none;">
-            <div class="metric-label">Total Features</div>
-            <div class="metric-value" id="ov-total-features">—</div>
-          </div>
           <div class="metric">
             <div class="metric-label">Rating Range</div>
             <div class="metric-value" id="ov-rating-range">—</div>
@@ -379,7 +375,6 @@
           // ── Overview ──
           const ov = await loadJSON('./data/overview.json');
           document.getElementById('ov-total-reviews').textContent = ov.total_reviews.toLocaleString();
-          document.getElementById('ov-total-features').textContent = ov.total_features;
           document.getElementById('ov-rating-range').textContent = `${ov.rating_min}–${ov.rating_max}`;
           document.getElementById('ov-duplicates').textContent = ov.duplicates;
           document.getElementById('ov-missing-review').textContent = ov.missing_review;
