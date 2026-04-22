@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -86,6 +87,76 @@ def fig_to_json_file(fig, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(fig.to_json(), encoding="utf-8")
     print(f"  ✓ {path.relative_to(ROOT)}")
+
+
+# ---------------------------------------------------------------------------
+# 0. Assignment 2 (Netflix ML) Plotly export (from executed notebook outputs)
+# ---------------------------------------------------------------------------
+
+# Looks for HTML outputs containing:
+#   <script>(function(){var fig={...};Plotly.newPlot('plotly-x', ...);})();</script>
+_PLOTLY_FIG_RE = re.compile(
+    r"var\s+fig\s*=\s*(\{.*?\})\s*;\s*Plotly\.newPlot",
+    flags=re.S,
+)
+
+
+def _iter_nb_html_outputs(nb: dict) -> "list[str]":
+    htmls: list[str] = []
+    for cell in nb.get("cells", []) or []:
+        for out in cell.get("outputs", []) or []:
+            data = (out.get("data") or {})
+            html = data.get("text/html")
+            if not html:
+                continue
+            if isinstance(html, list):
+                html = "".join(html)
+            if isinstance(html, str):
+                htmls.append(html)
+    return htmls
+
+
+def export_assignment2_netflix(out_dir: Path) -> None:
+    """Export Plotly figures from the executed Netflix notebook into JSON files."""
+    print("\n=== Assignment 2: Netflix ML (Plotly JSON export) ===")
+    ensure_dir(out_dir)
+
+    nb_path = ROOT / "Netflix_ML_Pipeline.executed.ipynb"
+    if not nb_path.exists():
+        print(f"  ! Skip: notebook not found: {nb_path.relative_to(ROOT)}")
+        return
+
+    nb = json.loads(nb_path.read_text(encoding="utf-8"))
+
+    figs: list[dict] = []
+    for html in _iter_nb_html_outputs(nb):
+        for m in _PLOTLY_FIG_RE.finditer(html):
+            blob = m.group(1)
+            try:
+                fig = json.loads(blob)
+            except json.JSONDecodeError:
+                continue
+            # cleanup noise
+            if isinstance(fig, dict) and isinstance(fig.get("config"), dict):
+                fig["config"].pop("plotlyServerURL", None)
+            figs.append(fig)
+
+    if not figs:
+        print("  ! No Plotly figures found in notebook outputs.")
+        return
+
+    manifest = {"count": len(figs), "figures": []}
+    for i, fig in enumerate(figs, start=1):
+        fname = f"fig_{i}.json"
+        (out_dir / fname).write_text(json.dumps(fig, ensure_ascii=False), encoding="utf-8")
+        manifest["figures"].append({"file": fname, "index": i})
+        print(f"  ✓ {out_dir.relative_to(ROOT) / fname}")
+
+    (out_dir / "manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    print(f"Assignment 2 export complete: {len(figs)} figure(s).")
 
 
 # ---------------------------------------------------------------------------

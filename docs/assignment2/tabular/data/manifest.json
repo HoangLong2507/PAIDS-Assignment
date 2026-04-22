@@ -1,0 +1,17 @@
+{
+  "count": 3,
+  "figures": [
+    {
+      "file": "fig_1.json",
+      "index": 1
+    },
+    {
+      "file": "fig_2.json",
+      "index": 2
+    },
+    {
+      "file": "fig_3.json",
+      "index": 3
+    }
+  ]
+}

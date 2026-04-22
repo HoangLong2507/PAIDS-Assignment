@@ -1,0 +1,197 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Logistic Regression</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --panel: #ffffff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --border: rgba(15, 23, 42, 0.10);
+        --header-bg: linear-gradient(90deg, rgba(59,130,246,0.12) 0%, rgba(37,99,235,0.10) 100%);
+
+        --green: #22c55e;
+        --orange: #fb923c;
+        --purple: #a78bfa;
+        --blue: #60a5fa;
+        --neutral: #f8fafc;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+      }
+
+      body {
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+        color: var(--text);
+        padding: 16px;
+      }
+
+      .table-container {
+        max-width: 760px;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      .cm-grid {
+        max-width: 760px;
+        margin: 0 auto;
+        background: var(--panel);
+      }
+
+      .cm-row {
+        display: grid;
+        grid-template-columns: 160px repeat(4, minmax(92px, 1fr));
+        gap: 10px;
+        align-items: stretch;
+        padding: 10px 0;
+      }
+
+      .cm-row.header {
+        padding: 12px;
+        border-radius: 12px;
+        background: var(--header-bg);
+        border: 1px solid var(--border);
+        font-weight: 800;
+      }
+
+      .cm-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 12px;
+        min-height: 44px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #ffffff;
+        text-align: center;
+        line-height: 1.15;
+        font-weight: 700;
+        box-sizing: border-box;
+      }
+
+      .cm-cell.corner,
+      .cm-row:not(.header) > .cm-cell:first-child {
+        justify-content: flex-start;
+        text-align: left;
+        font-weight: 800;
+        color: var(--text);
+        background: var(--neutral);
+      }
+
+      .cell-green {
+        background: color-mix(in srgb, var(--green) 92%, white);
+        color: #052e16;
+        border-color: color-mix(in srgb, var(--green) 35%, white);
+      }
+
+      .cell-orange {
+        background: color-mix(in srgb, var(--orange) 92%, white);
+        color: #431407;
+        border-color: color-mix(in srgb, var(--orange) 35%, white);
+      }
+
+      .cell-purple {
+        background: color-mix(in srgb, var(--purple) 88%, white);
+        color: #2e1065;
+        border-color: color-mix(in srgb, var(--purple) 32%, white);
+      }
+
+      .cell-blue {
+        background: color-mix(in srgb, var(--blue) 88%, white);
+        color: #0b1f4a;
+        border-color: color-mix(in srgb, var(--blue) 32%, white);
+      }
+
+      .cell-white {
+        background: var(--neutral);
+        color: var(--text);
+      }
+
+      .cell-default {
+        background: #ffffff;
+        color: var(--text);
+      }
+
+      .cm-cell:empty::before {
+        content: "\00a0";
+      }
+
+      .cm-row + .cm-row {
+        border-top: 1px dashed rgba(15, 23, 42, 0.08);
+      }
+
+      @media (max-width: 520px) {
+        body {
+          padding: 12px;
+        }
+        .cm-row {
+          grid-template-columns: 140px repeat(4, minmax(72px, 1fr));
+          gap: 8px;
+        }
+        .cm-cell {
+          min-height: 40px;
+          border-radius: 10px;
+          padding: 8px 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="table-container">
+      <div class="cm-grid">
+        <div class="cm-row header">
+          <div class="cm-cell corner">&nbsp;</div>
+          <div class="cm-cell">TV Show</div>
+          <div class="cm-cell">Movie</div>
+          <div class="cm-cell">Support</div>
+          <div class="cm-cell">Recall</div>
+        </div>
+
+        <div class="cm-row">
+          <div class="cm-cell">TV Show</div>
+          <div class="cm-cell cell-green">535</div>
+          <div class="cm-cell cell-white">0</div>
+          <div class="cm-cell cell-purple">535</div>
+          <div class="cm-cell cell-purple">100.0%</div>
+        </div>
+
+        <div class="cm-row">
+          <div class="cm-cell">Movie</div>
+          <div class="cm-cell cell-orange">9</div>
+          <div class="cm-cell cell-green">1217</div>
+          <div class="cm-cell cell-purple">1226</div>
+          <div class="cm-cell cell-purple">99.3%</div>
+        </div>
+
+        <div class="cm-row">
+          <div class="cm-cell">Predicted</div>
+          <div class="cm-cell cell-blue">544</div>
+          <div class="cm-cell cell-blue">1217</div>
+          <div class="cm-cell cell-default">Total: 1761</div>
+          <div class="cm-cell cell-default">F1(Mac): 99.4%</div>
+        </div>
+
+        <div class="cm-row">
+          <div class="cm-cell">Precision</div>
+          <div class="cm-cell cell-blue">98.3%</div>
+          <div class="cm-cell cell-blue">100.0%</div>
+          <div class="cm-cell cell-default">P(Mac): 99.2%</div>
+          <div class="cm-cell cell-default">R(Mac): 99.6%</div>
+        </div>
+
+        <div class="cm-row">
+          <div class="cm-cell">Accuracy</div>
+          <div class="cm-cell cell-default"></div>
+          <div class="cm-cell cell-default"></div>
+          <div class="cm-cell cell-default">99.5%</div>
+          <div class="cm-cell cell-default"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

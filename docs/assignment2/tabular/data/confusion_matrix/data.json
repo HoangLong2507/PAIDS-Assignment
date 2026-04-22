@@ -1,0 +1,88 @@
+{
+  "models": [
+    {
+      "id": "Logistic_Regression",
+      "name": "Logistic Regression",
+      "description": "Linear classifier with regularization, balanced performance",
+      "metrics": {
+        "accuracy": 0.9949,
+        "f1": 0.9949,
+        "precision": 0.9950,
+        "recall": 0.9949,
+        "roc_auc": 1.0,
+        "train_seconds": 0.016,
+        "infer_ms": 0.4468
+      }
+    },
+    {
+      "id": "Naive_Bayes",
+      "description": "Fast probabilistic classifier, excellent baseline for text classification",
+      "name": "Naive Bayes",
+      "metrics": {
+        "accuracy": 0.9960,
+        "f1": 0.9960,
+        "precision": 0.9960,
+        "recall": 0.9960,
+        "roc_auc": 0.9972,
+        "train_seconds": 0.001,
+        "infer_ms": 0.3337
+      }
+    },
+    {
+      "id": "SVM",
+      "name": "SVM",
+      "description": "Maximum margin classifier, robust to outliers",
+      "metrics": {
+        "accuracy": 0.9932,
+        "f1": 0.9932,
+        "precision": 0.9933,
+        "recall": 0.9932,
+        "roc_auc": 0.9999,
+        "train_seconds": 0.492,
+        "infer_ms": 24.5707
+      }
+    },
+    {
+      "id": "Random_Forest",
+      "name": "Random Forest",
+      "description": "Ensemble of decision trees, provides feature importance",
+      "metrics": {
+        "accuracy": 0.9994,
+        "f1": 0.9994,
+        "precision": 0.9994,
+        "recall": 0.9994,
+        "roc_auc": 1.0,
+        "train_seconds": 0.173,
+        "infer_ms": 8.7836
+      }
+    },
+    {
+      "id": "Gradient_Boosting",
+      "name": "Gradient Boosting",
+      "description": "Sequential ensemble, builds trees to correct errors" ,
+      "metrics": {
+        "accuracy": 0.9994,
+        "f1": 0.9994,
+        "precision": 0.9994,
+        "recall": 0.9994,
+        "roc_auc": 1.0,
+        "train_seconds": 0.428,
+        "infer_ms": 1.5226
+      }
+    },
+    {
+      "id": "MLP_Neural_Net",
+      "name": "MLP Neural Net",
+      "description": "Multi-layer neural network, learns non-linear patterns",
+      "metrics": {
+        "accuracy": 0.9977,
+        "f1": 0.9977,
+        "precision": 0.9977,
+        "recall": 0.9977,
+        "roc_auc": 1.0,
+        "train_seconds": 0.635,
+        "infer_ms": 0.6121
+      }
+    }
+  ]
+}
