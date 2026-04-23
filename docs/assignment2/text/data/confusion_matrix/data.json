@@ -1,0 +1,72 @@
+[
+  {
+    "id": "Linear_SVC",
+    "name": "Linear SVC",
+    "description": "Linear classifier with margin optimization, strong generalization",
+    "metrics": {
+      "accuracy": 0.8456,
+      "f1": 0.8425,
+      "precision": 0.8399,
+      "recall": 0.8456,
+      "roc_auc": 0.907103,
+      "train_seconds": 1.38,
+      "infer_s": 1111269
+    }
+  },
+  {
+    "id": "Logistic_Regression",
+    "name": "Logistic Regression",
+    "description": "Linear classifier with regularization, balanced performance",
+    "metrics": {
+      "accuracy": 0.8278,
+      "f1": 0.8399,
+      "precision": 0.8575,
+      "recall": 0.8278,
+      "roc_auc": 0.918025,
+      "train_seconds": 3.59,
+      "infer_s": 1564087
+    }
+  },
+  {
+    "id": "XGBoost",
+    "name": "XGBoost",
+    "description": "Gradient boosting model, high performance but slower training",
+    "metrics": {
+      "accuracy": 0.8241,
+      "f1": 0.8311,
+      "precision": 0.8399,
+      "recall": 0.8241,
+      "roc_auc": 0.905259,
+      "train_seconds": 231.08,
+      "infer_s": 58751
+    }
+  },
+  {
+    "id": "Naive_Bayes",
+    "name": "Naive Bayes",
+    "description": "Probabilistic classifier, very fast but lower expressive power",
+    "metrics": {
+      "accuracy": 0.7853,
+      "f1": 0.8069,
+      "precision": 0.8474,
+      "recall": 0.7853,
+      "roc_auc": 0.903331,
+      "train_seconds": 0.04,
+      "infer_s": 1626994
+    }
+  },
+  {
+    "id": "Random_Forest",
+    "name": "Random Forest",
+    "description": "Ensemble tree-based model, robust but slower inference",
+    "metrics": {
+      "accuracy": 0.8222,
+      "f1": 0.7702,
+      "precision": 0.8288,
+      "recall": 0.8222,
+      "roc_auc": 0.891171,
+      "train_seconds": 33.08,
+      "infer_s": 19398
+    }
+  }
+]
