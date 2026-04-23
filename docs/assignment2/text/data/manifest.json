@@ -1,0 +1,1 @@
+{"figures": ["overfitting.json", "model_f1.json", "roc_naive_bayes.json", "roc_logistic_regression.json", "roc_linear_svc.json", "roc_random_forest.json", "roc_xgboost.json"], "tables": ["confusion_matrix/Naive_Bayes.html", "confusion_matrix/Linear_SVC.html", "confusion_matrix/Random_Forest.html", "confusion_matrix/XGBoost.html", "confusion_matrix/Logistic_Regression.html"]}

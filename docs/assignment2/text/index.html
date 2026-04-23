@@ -1,0 +1,1312 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Assignment 2 (Text): TripAdvisor - Text ML"
+    />
+    <title>Assignment 2: TripAdvisor Text — TF-IDF</title>
+
+    <link rel="stylesheet" href="../../static/assignment1.styles.css" />
+
+    <style>
+      /* Small page-specific styles re-using tabular layout */
+
+      /* Data Preparation section */
+      .prep-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-top: 14px;
+      }
+      .prep-step {
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        background: rgba(255, 255, 255, 0.75);
+        border-radius: 16px;
+        padding: 14px;
+      }
+      .prep-step-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .prep-step-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+      }
+      .prep-step-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: rgba(59, 130, 246, 0.14);
+        border: 1px solid rgba(59, 130, 246, 0.22);
+        color: rgba(30, 64, 175, 1);
+        font-weight: 800;
+        font-size: 12px;
+      }
+      .prep-step-desc {
+        margin: 0;
+        color: var(--muted);
+        max-width: 72ch;
+        line-height: 1.4;
+      }
+      .prep-step-tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .prep-tag {
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        background: rgba(15, 23, 42, 0.03);
+        color: rgba(15, 23, 42, 0.8);
+      }
+      .prep-tag.ok {
+        border-color: rgba(16, 185, 129, 0.35);
+        background: rgba(16, 185, 129, 0.1);
+        color: rgba(6, 95, 70, 1);
+      }
+      .prep-tag.warn {
+        border-color: rgba(245, 158, 11, 0.35);
+        background: rgba(245, 158, 11, 0.12);
+        color: rgba(146, 64, 14, 1);
+      }
+      .transform {
+        display: grid;
+        grid-template-columns: 1fr 60px 1fr;
+        gap: 12px;
+        align-items: stretch;
+      }
+      @media (max-width: 900px) {
+        .transform {
+          grid-template-columns: 1fr;
+        }
+      }
+      .cardlet {
+        border-radius: 14px;
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        background: rgba(15, 23, 42, 0.02);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .cardlet .cardlet-h {
+        padding: 10px 12px;
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-weight: 800;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex: 0 0 auto;
+      }
+      .cardlet .cardlet-b {
+        padding: 10px 12px;
+        overflow: auto;
+        flex: 1 1 auto;
+      }
+      .before .cardlet-h {
+        background: rgba(239, 68, 68, 0.08);
+      }
+      .after .cardlet-h {
+        background: rgba(34, 197, 94, 0.1);
+      }
+      .arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        border: 1px dashed rgba(59, 130, 246, 0.35);
+        background: rgba(59, 130, 246, 0.06);
+        color: rgba(30, 64, 175, 1);
+        font-weight: 900;
+        font-size: 14px;
+      }
+      @media (max-width: 900px) {
+        .arrow {
+          height: 44px;
+        }
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 10px;
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.8);
+        font-size: 12px;
+        color: rgba(15, 23, 42, 0.8);
+      }
+      .pill b {
+        color: rgba(15, 23, 42, 1);
+      }
+      .pill .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(99, 102, 241, 0.9);
+      }
+      code.inline {
+        background: rgba(15, 23, 42, 0.05);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 8px;
+        padding: 2px 6px;
+        font-size: 0.95em;
+        color: #db2777;
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+      .example {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: 100%;
+        justify-content: center;
+      }
+      .rowline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.7);
+        min-height: 42px;
+      }
+      .fields {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .field {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 8px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        background: rgba(15, 23, 42, 0.02);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+      .k {
+        color: rgba(15, 23, 42, 0.7);
+        font-weight: 800;
+        letter-spacing: 0.01em;
+      }
+      .v {
+        color: rgba(15, 23, 42, 1);
+        font-weight: 700;
+      }
+      .stamp {
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        background: rgba(15, 23, 42, 0.02);
+        color: rgba(15, 23, 42, 0.75);
+        flex: 0 0 auto;
+        font-weight: 600;
+      }
+      .stamp.bad {
+        border-color: rgba(239, 68, 68, 0.3);
+        background: rgba(239, 68, 68, 0.08);
+        color: rgba(127, 29, 29, 1);
+      }
+      .stamp.good {
+        border-color: rgba(34, 197, 94, 0.3);
+        background: rgba(34, 197, 94, 0.1);
+        color: rgba(6, 95, 70, 1);
+      }
+
+      .plot {
+        background: rgba(15, 23, 42, 0.02);
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        border-radius: 12px;
+        padding: 8px;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .two-up {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      @media (max-width: 900px) {
+        .two-up {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Section 5: model picker + compare */
+      .model-picker {
+        margin-top: 12px;
+      }
+
+      .model-picker-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      .model-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 12px;
+      }
+
+      .model-card {
+        grid-column: span 4;
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.75);
+        padding: 14px;
+        cursor: pointer;
+        user-select: none;
+        transition:
+          transform 120ms ease,
+          box-shadow 120ms ease,
+          border-color 120ms ease,
+          background 120ms ease;
+        display: grid;
+        grid-template-rows: auto auto 1fr;
+        gap: 10px;
+        min-height: 150px;
+      }
+
+      .model-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        border-color: rgba(59, 130, 246, 0.35);
+      }
+
+      .model-card.selected {
+        border-color: rgba(59, 130, 246, 0.55);
+        background: rgba(59, 130, 246, 0.08);
+        box-shadow: 0 12px 40px rgba(59, 130, 246, 0.12);
+      }
+
+      .model-name {
+        font-weight: 900;
+        letter-spacing: -0.01em;
+      }
+
+      .model-meta {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .meta-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        background: rgba(255, 255, 255, 0.8);
+        font-size: 12px;
+        color: rgba(15, 23, 42, 0.8);
+        white-space: nowrap;
+      }
+
+      .meta-pill .ico {
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        background: rgba(15, 23, 42, 0.06);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+      }
+
+      .model-desc {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      @media (max-width: 980px) {
+        .model-card {
+          grid-column: span 6;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .model-card {
+          grid-column: span 12;
+        }
+      }
+
+      .compare-area {
+        margin-top: 16px;
+      }
+
+      /* Compare button style */
+      #compare-btn.chip {
+        background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 10px;
+        box-shadow: 0 8px 22px rgba(37, 99, 235, 0.12);
+        font-weight: 800;
+        cursor: pointer;
+        transition:
+          transform 120ms ease,
+          box-shadow 120ms ease,
+          opacity 120ms ease;
+      }
+
+      #compare-btn.chip[disabled],
+      #compare-btn.chip[aria-disabled="true"] {
+        opacity: 0.45;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      #compare-btn.chip:hover:not([disabled]) {
+        transform: translateY(-2px);
+      }
+
+      /* Compare area container */
+      .compare-area {
+        margin-top: 16px;
+        padding-top: 6px;
+        border-top: 1px solid rgba(15, 23, 42, 0.08);
+      }
+
+      .compare-table-wrap {
+        overflow: auto;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 10px;
+      }
+
+      /* Custom compare grid: metrics as columns, models as rows */
+      .compare-matrix {
+        display: grid;
+        gap: 8px;
+        min-width: 720px;
+      }
+
+      .compare-matrix-row {
+        display: grid;
+        grid-template-columns: 220px repeat(
+            var(--metric-count, 7),
+            minmax(120px, 1fr)
+          );
+        gap: 8px;
+        align-items: stretch;
+      }
+
+      .compare-matrix-row.header {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(6px);
+        padding: 6px 0;
+      }
+
+      .compare-corner {
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: rgba(15, 23, 42, 0.02);
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        font-weight: 900;
+        color: rgba(15, 23, 42, 0.6);
+      }
+
+      .compare-metric-h {
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: rgba(59, 130, 246, 0.08);
+        border: 1px solid rgba(59, 130, 246, 0.12);
+        font-weight: 900;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .compare-model-cell {
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: rgba(15, 23, 42, 0.02);
+        border: 1px solid rgba(15, 23, 42, 0.06);
+      }
+
+      .compare-model-name {
+        font-weight: 900;
+      }
+
+      .compare-model-desc {
+        color: var(--muted);
+        font-size: 12.5px;
+        margin-top: 4px;
+      }
+
+      .compare-val {
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        text-align: center;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      .compare-val.best {
+        background: linear-gradient(
+          90deg,
+          rgba(34, 197, 94, 0.14),
+          rgba(16, 185, 129, 0.06)
+        );
+        border-color: rgba(34, 197, 94, 0.22);
+      }
+
+      /* special styling for Train and Inference values */
+      .compare-val.train {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono",
+          "Courier New", monospace;
+        color: rgba(17, 24, 39, 0.95);
+      }
+
+      .compare-val.infer {
+        font-size: 13px;
+        color: rgba(63, 63, 70, 0.95);
+      }
+
+      /* Custom compare grid (metric rows on left, models columns) */
+      .compare-grid {
+        display: grid;
+        gap: 8px;
+        grid-auto-flow: row;
+        margin: 6px 0 12px 0;
+      }
+
+      .compare-grid .compare-head {
+        display: grid;
+        grid-template-columns: 220px repeat(var(--cols, 2), 1fr);
+        gap: 8px;
+        align-items: center;
+        padding: 10px;
+        background: rgba(15, 23, 42, 0.02);
+        border-radius: 8px;
+      }
+
+      .compare-grid .compare-row {
+        display: grid;
+        grid-template-columns: 220px repeat(var(--cols, 2), 1fr);
+        gap: 8px;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: white;
+        border: 1px solid rgba(15, 23, 42, 0.04);
+      }
+
+      .compare-metric {
+        font-weight: 800;
+        color: rgba(15, 23, 42, 0.75);
+      }
+
+      .compare-cell {
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .compare-cell.best {
+        background: linear-gradient(
+          90deg,
+          rgba(34, 197, 94, 0.12),
+          rgba(16, 185, 129, 0.06)
+        );
+        border: 1px solid rgba(34, 197, 94, 0.16);
+      }
+
+      /* Confusion matrices stacked (one per row) */
+      .compare-cm {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      .compare-cm .cm-row {
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        border-radius: 12px;
+        padding: 12px;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+        overflow: hidden;
+      }
+
+      .cm-header {
+        padding: 12px 14px;
+        background: linear-gradient(
+          90deg,
+          rgba(59, 130, 246, 0.12),
+          rgba(37, 99, 235, 0.06)
+        );
+        color: rgba(15, 23, 42, 0.95);
+        font-weight: 900;
+        border-radius: 12px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.04);
+      }
+
+      .cm-body {
+        background: white;
+      }
+
+      .cm-cm-title {
+        font-weight: 900;
+        font-size: 18px;
+        color: rgba(15, 23, 42, 0.95);
+      }
+
+      .cm-cm-desc {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .compare-cm .cm-row iframe {
+        width: 100%;
+        height: 380px;
+        /* fixed limit per request */
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 8px;
+        background: white;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+      }
+
+      @media (max-width: 980px) {
+        .compare-cm .cm-row {
+          grid-template-columns: 1fr;
+        }
+
+        .compare-cm .cm-row iframe {
+          height: 350px;
+        }
+      }
+    </style>
+
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  </head>
+
+  <body>
+    <header class="topbar">
+      <div class="container">
+        <div class="nav">
+          <a class="brand" href="../../index.html" aria-label="Back to home">
+            <div class="brand-badge" aria-hidden="true"></div>
+            <div class="brand-text">
+              <div class="brand-title">PAIDS Assignments</div>
+              <div class="brand-sub">Assignment 2 • Text • TripAdvisor ML</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="return-btn">
+        <a class="btn" href="../" style="text-decoration: none; color: black"
+          >← Back</a
+        >
+      </div>
+
+      <section class="card part-card" id="top">
+        <h1 class="part-title">✍️ TripAdvisor — Text ML (TF-IDF)</h1>
+      </section>
+
+      <section class="card" id="data-preprocessing">
+        <h2>Data Preprocessing</h2>
+        <div class="prep-steps">
+          <!-- Step 1 -->
+          <article class="prep-step">
+            <div class="prep-step-head">
+              <div>
+                <div class="prep-step-title">
+                  <span class="prep-step-badge">1</span>
+                  Data Extraction &amp; Integrity
+                </div>
+                <p class="prep-step-desc">
+                  Identify null entries and remove duplicate reviews to prevent
+                  the model from overfitting on repeated data.
+                </p>
+              </div>
+              <div class="prep-step-tags">
+                <span class="prep-tag">Cleaning</span>
+                <span class="prep-tag ok">Deduplication</span>
+              </div>
+            </div>
+            <div class="transform">
+              <div class="cardlet before">
+                <div class="cardlet-h">
+                  <span>Before</span>
+                  <span class="pill"
+                    ><span class="dot" style="background: #ef4444"></span
+                    ><b>Raw Input</b></span
+                  >
+                </div>
+                <div class="cardlet-b">
+                  <div class="example">
+                    <div class="rowline">
+                      <div class="fields">
+                        <span class="field"
+                          ><span class="k">Dataset</span
+                          ><span class="v">20,491 entries</span></span
+                        >
+                      </div>
+                      <span class="stamp bad"
+                        >Includes Duplicates &amp; NULLs</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="arrow">→</div>
+              <div class="cardlet after">
+                <div class="cardlet-h">
+                  <span>After</span>
+                  <span class="pill"
+                    ><span class="dot" style="background: #22c55e"></span
+                    ><b>Clean DataFrame</b></span
+                  >
+                </div>
+                <div class="cardlet-b">
+                  <div class="example">
+                    <div class="rowline">
+                      <div class="fields">
+                        <span class="field"
+                          ><span class="k">Dataset</span
+                          ><span class="v">Cleaned entries</span></span
+                        >
+                      </div>
+                      <span class="stamp good">0 Missing, 0 Dupl.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Step 2 -->
+          <article class="prep-step">
+            <div class="prep-step-head">
+              <div>
+                <div class="prep-step-title">
+                  <span class="prep-step-badge">2</span>
+                  Sentiment Grouping (Mapping)
+                </div>
+                <p class="prep-step-desc">
+                  To simplify the classification task and address class
+                  imbalance, the 5-star ordinal ratings are condensed into 3
+                  broader sentiment categories.
+                </p>
+              </div>
+              <div class="prep-step-tags">
+                <span class="prep-tag">Target</span>
+                <span class="prep-tag ok">Multiclass (3)</span>
+              </div>
+            </div>
+            <div class="transform">
+              <div class="cardlet before">
+                <div class="cardlet-h">
+                  <span>Before</span>
+                  <span class="pill"
+                    ><span class="dot" style="background: #ef4444"></span
+                    ><b>5-star ordinal</b></span
+                  >
+                </div>
+                <div class="cardlet-b">
+                  <div class="example">
+                    <div class="rowline">
+                      <div class="fields">
+                        <span class="field"
+                          ><span class="k">Rating</span
+                          ><span class="v">1★ or 2★</span></span
+                        >
+                      </div>
+                      <span class="stamp">Dissatisfaction</span>
+                    </div>
+                    <div class="rowline">
+                      <div class="fields">
+                        <span class="field"
+                          ><span class="k">Rating</span
+                          ><span class="v">3★</span></span
+                        >
+                      </div>
+                      <span class="stamp">Mixed</span>
+                    </div>
+                    <div class="rowline">
+                      <div class="fields">
+                        <span class="field"
+                          ><span class="k">Rating</span
+                          ><span class="v">4★ or 5★</span></span
+                        >
+                      </div>
+                      <span class="stamp">Satisfaction</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="arrow">→</div>
+              <div class="cardlet after">
+                <div class="cardlet-h">
+                  <span>After</span>
+                  <span class="pill"
+                    ><span class="dot" style="background: #22c55e"></span
+                    ><b>3 sentiments</b></span
+                  >
+                </div>
+                <div class="cardlet-b">
+                  <div class="example">
+                    <div class="rowline">
+                      <div class="fields">
+                        <span class="field"
+                          ><span class="k">Sentiment</span
+                          ><span class="v" style="color: #ef4444"
+                            >negative</span
+                          ></span
+                        >
+                      </div>
+                    </div>
+                    <div class="rowline">
+                      <div class="fields">
+                        <span class="field"
+                          ><span class="k">Sentiment</span
+                          ><span class="v" style="color: #8b5cf6"
+                            >neutral</span
+                          ></span
+                        >
+                      </div>
+                    </div>
+                    <div class="rowline">
+                      <div class="fields">
+                        <span class="field"
+                          ><span class="k">Sentiment</span
+                          ><span class="v" style="color: #22c55e"
+                            >positive</span
+                          ></span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Step 3 -->
+          <article class="prep-step">
+            <div class="prep-step-head">
+              <div>
+                <div class="prep-step-title">
+                  <span class="prep-step-badge">3</span>
+                  Negation Restoration (Regex Cleaning)
+                </div>
+                <p class="prep-step-desc">
+                  Standard tokenizers often break contractions (e.g., "wasn't"
+                  becomes "was" and "nt"). Use Regex
+                  <code class="inline">\b(\w+) nt\b</code> to fix these
+                  fragments so the "not" meaning is preserved (preventing
+                  stopword removal from deleting negative context).
+                </p>
+              </div>
+              <div class="prep-step-tags">
+                <span class="prep-tag">Regex</span>
+                <span class="prep-tag ok">Text Normalization</span>
+              </div>
+            </div>
+            <div class="transform">
+              <div class="cardlet before">
+                <div class="cardlet-h">
+                  <span>Before</span>
+                  <span class="pill"
+                    ><span class="dot" style="background: #ef4444"></span
+                    ><b>Broken Text</b></span
+                  >
+                </div>
+                <div class="cardlet-b">
+                  <div class="example">
+                    <div class="rowline">
+                      <div
+                        class="fields"
+                        style="
+                          white-space: normal;
+                          font-size: 13.5px;
+                          opacity: 0.9;
+                          color: rgba(15, 23, 42, 0.9);
+                          line-height: 1.5;
+                        "
+                      >
+                        <span
+                          >"The service was
+                          <strong
+                            style="
+                              color: #ef4444;
+                              background: rgba(239, 68, 68, 0.1);
+                              padding: 0 4px;
+                              border-radius: 4px;
+                            "
+                            >nt</strong
+                          >
+                          good and I did
+                          <strong
+                            style="
+                              color: #ef4444;
+                              background: rgba(239, 68, 68, 0.1);
+                              padding: 0 4px;
+                              border-radius: 4px;
+                            "
+                            >nt</strong
+                          >
+                          like the room."</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="arrow">→</div>
+              <div class="cardlet after">
+                <div class="cardlet-h">
+                  <span>After</span>
+                  <span class="pill"
+                    ><span class="dot" style="background: #22c55e"></span
+                    ><b>Restored Text</b></span
+                  >
+                </div>
+                <div class="cardlet-b">
+                  <div class="example">
+                    <div class="rowline">
+                      <div
+                        class="fields"
+                        style="
+                          white-space: normal;
+                          font-size: 13.5px;
+                          opacity: 0.9;
+                          color: rgba(15, 23, 42, 0.9);
+                          line-height: 1.5;
+                        "
+                      >
+                        <span
+                          >"The service was
+                          <strong
+                            style="
+                              color: #22c55e;
+                              background: rgba(34, 197, 94, 0.1);
+                              padding: 0 4px;
+                              border-radius: 4px;
+                            "
+                            >not</strong
+                          >
+                          good and I did
+                          <strong
+                            style="
+                              color: #22c55e;
+                              background: rgba(34, 197, 94, 0.1);
+                              padding: 0 4px;
+                              border-radius: 4px;
+                            "
+                            >not</strong
+                          >
+                          like the room."</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top: 14px">
+        <h2>ROC curves — One-vs-Rest per class</h2>
+        <div id="roc-curves" class="two-up"></div>
+      </section>
+
+      <section class="card">
+        <h2>Overfitting diagnosis (Train F1 vs Test F1)</h2>
+        <div
+          id="model-comparisons"
+          style="display: flex; flex-direction: column; gap: 12px"
+        ></div>
+      </section>
+
+      <section class="card" id="details">
+        <h2>Detail Confusion Matrix</h2>
+
+        <div class="model-picker">
+          <div class="model-picker-head">
+            <p class="muted" style="margin: 0">
+              Click to select models, then compare.
+            </p>
+            <button
+              id="compare-btn"
+              class="chip"
+              type="button"
+              aria-disabled="true"
+              disabled
+            >
+              Compare
+            </button>
+          </div>
+
+          <div id="model-grid" class="model-grid" aria-label="Model list"></div>
+        </div>
+
+        <div id="compare-area" class="compare-area" style="display: none">
+          <h3 style="margin: 10px 0 8px 0">Comparison Result</h3>
+          <div class="compare-table-wrap">
+            <table id="compare-table" class="compare-table"></table>
+          </div>
+
+          <h3 style="margin: 14px 0 8px 0">Confusion matrices</h3>
+          <div id="compare-cm" class="compare-cm"></div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      async function fetchText(url) {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
+        return await res.text();
+      }
+
+      async function loadJSON(url) {
+        return JSON.parse(await fetchText(url));
+      }
+
+      async function renderFromFigureJSON(el, fig) {
+        if (!el) return;
+        try {
+          await Plotly.newPlot(
+            el,
+            fig.data || fig.traces || [],
+            fig.layout || {},
+            { responsive: true },
+          );
+        } catch (e) {
+          console.error("Plotly render error", e);
+          el.innerText = "Failed to render figure.";
+        }
+      }
+
+      (async () => {
+        const manifest = await loadJSON("./data/manifest.json");
+
+        for (const file of manifest.figures || []) {
+          const fig = await loadJSON("./data/" + file);
+          const containerId = file.startsWith("roc_")
+            ? "roc-curves"
+            : "model-comparisons";
+
+          const container = document.getElementById(containerId);
+          const plotDiv = document.createElement("div");
+          plotDiv.className = "plot";
+          plotDiv.style.minHeight = "380px";
+          container.appendChild(plotDiv);
+
+          await renderFromFigureJSON(plotDiv, fig);
+        }
+
+        // Section 5: model cards + compare
+        const modelData = await loadJSON("./data/confusion_matrix/data.json");
+        const allModels = (modelData || []).slice();
+
+        const grid = document.getElementById("model-grid");
+        const compareBtn = document.getElementById("compare-btn");
+        const compareArea = document.getElementById("compare-area");
+        const compareTable = document.getElementById("compare-table");
+        const compareCM = document.getElementById("compare-cm");
+
+        const selected = new Set();
+
+        function fmtPct(v) {
+          if (v === null || v === undefined || Number.isNaN(v)) return "-";
+          return `${(v * 100).toFixed(2)}%`;
+        }
+        function fmtSec(v) {
+          if (v === null || v === undefined || Number.isNaN(v)) return "-";
+          return `${v.toFixed(3)}s`;
+        }
+        function fmtNum(v) {
+          if (v === null || v === undefined || Number.isNaN(v)) return "-";
+          return `${v}`;
+        }
+
+        function updateCompareBtn() {
+          compareBtn.disabled = false;
+          if (selected.size) {
+            compareBtn.removeAttribute("aria-disabled");
+          }
+          compareBtn.textContent = selected.size
+            ? `Compare (${selected.size})`
+            : "Compare";
+        }
+
+        function makeModelCard(m) {
+          const card = document.createElement("div");
+          card.className = "model-card";
+          card.setAttribute("role", "button");
+          card.setAttribute("tabindex", "0");
+          card.setAttribute("aria-pressed", "false");
+          card.dataset.modelId = m.id;
+
+          const name = document.createElement("div");
+          name.className = "model-name";
+          name.textContent = m.name || m.id;
+
+          const meta = document.createElement("div");
+          meta.className = "model-meta";
+
+          const acc = document.createElement("span");
+          acc.className = "meta-pill";
+          acc.innerHTML = `<span class="ico" title="Accuracy">🎯</span><b>${fmtPct(m.metrics?.accuracy)}</b>`;
+
+          const train = document.createElement("span");
+          train.className = "meta-pill";
+          train.innerHTML = `<span class="ico" title="Train time">⏱</span><b>${fmtSec(m.metrics?.train_seconds)}</b>`;
+
+          meta.appendChild(acc);
+          meta.appendChild(train);
+
+          const desc = document.createElement("p");
+          desc.className = "model-desc";
+          desc.textContent = m.description || "";
+
+          card.appendChild(name);
+          card.appendChild(meta);
+          card.appendChild(desc);
+
+          function toggle() {
+            const id = m.id;
+            if (selected.has(id)) {
+              selected.delete(id);
+              card.classList.remove("selected");
+              card.setAttribute("aria-pressed", "false");
+            } else {
+              selected.add(id);
+              card.classList.add("selected");
+              card.setAttribute("aria-pressed", "true");
+            }
+            updateCompareBtn();
+          }
+
+          card.addEventListener("click", toggle);
+          card.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              toggle();
+            }
+          });
+
+          return card;
+        }
+
+        function buildCompare(selectedModels) {
+          compareTable.innerHTML = "";
+          compareCM.innerHTML = "";
+
+          const metricsOrder = [
+            "accuracy",
+            "precision",
+            "recall",
+            "f1",
+            "roc_auc",
+            "train_seconds",
+            "infer_s",
+          ];
+
+          const metricLabelMap = {
+            accuracy: "Accuracy",
+            precision: "Precision",
+            recall: "Recall",
+            f1: "F1",
+            roc_auc: "ROC AUC",
+            train_seconds: "Train",
+            infer_s: "Inference",
+          };
+          function prettyLabel(k) {
+            return metricLabelMap[k] || k.charAt(0).toUpperCase() + k.slice(1);
+          }
+
+          const higherIsBetter = new Set([
+            "accuracy",
+            "precision",
+            "recall",
+            "f1",
+            "roc_auc",
+          ]);
+
+          const bestByMetric = {};
+          metricsOrder.forEach((k) => {
+            const values = selectedModels
+              .map((m) => Number(m.metrics?.[k]))
+              .filter((v) => Number.isFinite(v));
+            if (!values.length) {
+              bestByMetric[k] = null;
+              return;
+            }
+            bestByMetric[k] = higherIsBetter.has(k)
+              ? Math.max(...values)
+              : Math.min(...values);
+          });
+
+          const matrix = document.createElement("div");
+          matrix.className = "compare-matrix";
+          matrix.style.setProperty(
+            "--metric-count",
+            String(metricsOrder.length),
+          );
+
+          const header = document.createElement("div");
+          header.className = "compare-matrix-row header";
+
+          const corner = document.createElement("div");
+          corner.className = "compare-corner";
+          corner.textContent = "";
+          header.appendChild(corner);
+
+          metricsOrder.forEach((k) => {
+            const mh = document.createElement("div");
+            mh.className = "compare-metric-h";
+            mh.textContent = prettyLabel(k);
+            header.appendChild(mh);
+          });
+          matrix.appendChild(header);
+
+          selectedModels.forEach((m) => {
+            const row = document.createElement("div");
+            row.className = "compare-matrix-row";
+
+            const modelCell = document.createElement("div");
+            modelCell.className = "compare-model-cell";
+            const mn = document.createElement("div");
+            mn.className = "compare-model-name";
+            mn.textContent = m.name || m.id;
+            modelCell.appendChild(mn);
+            row.appendChild(modelCell);
+
+            metricsOrder.forEach((k) => {
+              const raw = Number(m.metrics?.[k]);
+              const cell = document.createElement("div");
+              cell.className = "compare-val";
+              if (k === "train_seconds") cell.classList.add("train");
+              if (k === "infer_s") cell.classList.add("infer");
+
+              let text = "-";
+              if (Number.isFinite(raw)) {
+                if (k === "train_seconds") text = fmtSec(raw);
+                else if (k === "infer_s")
+                  text = `${raw}ms`; // in text data, infer_s is actually huge integers representing ns/us, but let's just show raw value. Wait! It is infer_s but the value is huge integers because it's probably infer_time format. Wait, tabular used infer_ms. For text, let's just show raw ms.
+                else if (higherIsBetter.has(k)) text = fmtPct(raw);
+                else text = fmtNum(raw);
+              }
+              // Adjust text for infer_s because the value is high
+              if (k === "infer_s" && Number.isFinite(raw)) {
+                text = `${raw}`; // the user asked to minimize it. Let's show the raw number.
+              }
+              cell.textContent = text;
+
+              const best = bestByMetric[k];
+              if (best !== null && Number.isFinite(raw)) {
+                const isBest = Math.abs(raw - best) <= 1e-12;
+                if (isBest) cell.classList.add("best");
+              }
+
+              row.appendChild(cell);
+            });
+
+            matrix.appendChild(row);
+          });
+
+          compareTable.appendChild(matrix);
+
+          selectedModels.forEach((m) => {
+            const row = document.createElement("div");
+            row.className = "cm-row";
+
+            const header = document.createElement("div");
+            header.className = "cm-header";
+            const headerName = document.createElement("span");
+            headerName.textContent = `${m.name || m.id} - Accuracy: ${fmtPct(m.metrics?.accuracy)}`;
+            headerName.style.fontWeight = "700";
+            header.appendChild(headerName);
+
+            const body = document.createElement("div");
+            body.className = "cm-body";
+
+            const frame = document.createElement("iframe");
+            // ID in text ML are Linear_SVC, etc. Filenames are Linear_SVC.html
+            frame.src = `./data/confusion_matrix/${m.id}.html`;
+            frame.setAttribute("title", `Confusion matrix: ${m.name || m.id}`);
+
+            body.appendChild(frame);
+            row.appendChild(header);
+            row.appendChild(body);
+            compareCM.appendChild(row);
+          });
+        }
+
+        grid.innerHTML = "";
+        allModels.forEach((m) => grid.appendChild(makeModelCard(m)));
+        updateCompareBtn();
+
+        compareBtn.addEventListener("click", () => {
+          const selectedModels = allModels.filter((m) => selected.has(m.id));
+          if (selectedModels.length < 1) return;
+
+          compareArea.style.display = "block";
+          buildCompare(selectedModels);
+
+          compareArea.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      })().catch((err) => console.error(err));
+    </script>
+  </body>
+</html>
