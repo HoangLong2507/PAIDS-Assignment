@@ -132,6 +132,107 @@
         background: rgba(245, 158, 11, 0.12);
         color: rgba(146, 64, 14, 1);
       }
+
+      /* Feature Engineering: callout + custom table */
+      .fe-callout {
+        margin-top: 10px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(59, 130, 246, 0.16);
+        background: linear-gradient(180deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.03));
+      }
+      .fe-callout h3 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        font-weight: 900;
+      }
+      .fe-callout blockquote {
+        margin: 0;
+        padding: 10px 12px;
+        border-left: 4px solid rgba(59, 130, 246, 0.5);
+        background: rgba(255, 255, 255, 0.75);
+        border-radius: 10px;
+        color: rgba(15, 23, 42, 0.75);
+      }
+      .fe-table-wrap {
+        margin-top: 12px;
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        border-radius: 14px;
+        overflow: hidden;
+        background: linear-gradient(180deg, #ffffff, #fbfdff);
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.04);
+      }
+      table.fe-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 13px;
+      }
+      table.fe-table thead th {
+        background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        font-weight: 900;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+        padding: 12px 14px;
+      }
+      table.fe-table tbody td {
+        padding: 12px 14px;
+        border-top: 1px solid rgba(15, 23, 42, 0.04);
+        vertical-align: top;
+      }
+      table.fe-table tbody tr:nth-child(even) td {
+        background: rgba(15, 23, 42, 0.015);
+      }
+      table.fe-table code {
+        background: rgba(15, 23, 42, 0.03);
+        padding: 3px 6px;
+        border-radius: 7px;
+        border: 1px solid rgba(15, 23, 42, 0.05);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
+      }
+      .fe-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(59, 130, 246, 0.18);
+        background: rgba(59, 130, 246, 0.08);
+        font-weight: 800;
+        color: rgba(30, 64, 175, 1);
+        font-size: 12px;
+      }
+      @media (max-width: 720px) {
+        .fe-table-wrap {
+          overflow: auto;
+        }
+        table.fe-table {
+          min-width: 720px;
+        }
+      }
+
+      /* Feature selection & scaling: compact panel */
+      .fss-panel {
+        margin-top: 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(250, 250, 250, 0.9));
+        padding: 12px 14px;
+      }
+      .fss-panel pre {
+        margin: 0;
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.03);
+      }
+      .fss-excluded {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(244, 63, 94, 0.18);
+        background: rgba(244, 63, 94, 0.06);
+        color: rgba(136, 19, 55, 1);
+        font-weight: 700;
+      }
       .transform {
         display: grid;
         grid-template-columns: 1fr 60px 1fr;
@@ -751,108 +852,6 @@
               <div>
                 <div class="prep-step-title">
                   <span class="prep-step-badge">1</span>
-                  Encode target variable
-                </div>
-                <p class="prep-step-desc">
-                  Convert the class label <code class="inline">type</code>
-                  (Movie/TV Show) into a binary numeric target for
-                  classification.
-                </p>
-              </div>
-              <div class="prep-step-tags">
-                <span class="prep-tag">target</span>
-                <span class="prep-tag ok">binary (0/1)</span>
-              </div>
-            </div>
-
-            <div class="transform">
-              <div class="cardlet before">
-                <div class="cardlet-h">
-                  <span>Before</span>
-                  <span class="pill"
-                    ><span class="dot"></span><b>type</b> is text</span
-                  >
-                </div>
-                <div class="cardlet-b">
-                  <div class="example">
-                    <div class="rowline">
-                      <div class="fields">
-                        <span class="field"
-                          ><span class="k">show_id</span
-                          ><span class="v">s1</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">type</span
-                          ><span class="v">Movie</span></span
-                        >
-                      </div>
-                      <span class="stamp bad">label = text</span>
-                    </div>
-                    <div class="rowline">
-                      <div class="fields">
-                        <span class="field"
-                          ><span class="k">show_id</span
-                          ><span class="v">s2</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">type</span
-                          ><span class="v">TV Show</span></span
-                        >
-                      </div>
-                      <span class="stamp bad">label = text</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="arrow">→</div>
-
-              <div class="cardlet after">
-                <div class="cardlet-h">
-                  <span>After</span>
-                  <span class="pill ok"
-                    ><span class="dot"></span><b>y</b> numeric</span
-                  >
-                </div>
-                <div class="cardlet-b">
-                  <div class="example">
-                    <div class="rowline">
-                      <div class="fields">
-                        <span class="field"
-                          ><span class="k">show_id</span
-                          ><span class="v">s1</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">y</span
-                          ><span class="v derived">1</span></span
-                        >
-                      </div>
-                      <span class="stamp good">Movie → 1</span>
-                    </div>
-                    <div class="rowline">
-                      <div class="fields">
-                        <span class="field"
-                          ><span class="k">show_id</span
-                          ><span class="v">s2</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">y</span
-                          ><span class="v derived">0</span></span
-                        >
-                      </div>
-                      <span class="stamp good">TV Show → 0</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="prep-step">
-            <div class="prep-step-head">
-              <div>
-                <div class="prep-step-title">
-                  <span class="prep-step-badge">2</span>
                   Handle missing values
                 </div>
                 <p class="prep-step-desc">
@@ -1001,166 +1000,56 @@
             <div class="prep-step-head">
               <div>
                 <div class="prep-step-title">
-                  <span class="prep-step-badge">3</span>
-                  Feature engineering
+                  <span class="prep-step-badge">2</span>
+                  Encode target variable
                 </div>
                 <p class="prep-step-desc">
-                  Extract useful signals from messy columns (duration, dates,
-                  genres) into simple numeric features.
+                  Convert the class label <code class="inline">type</code>
+                  (Movie/TV Show) into a binary numeric target for
+                  classification.
                 </p>
               </div>
               <div class="prep-step-tags">
-                <span class="prep-tag">numeric</span>
-                <span class="prep-tag">date parts</span>
+                <span class="prep-tag">target</span>
+                <span class="prep-tag ok">binary (0/1)</span>
               </div>
             </div>
 
             <div class="transform">
               <div class="cardlet before">
-                <div class="cardlet-h"><span>Before</span></div>
+                <div class="cardlet-h">
+                  <span>Before</span>
+                  <span class="pill"
+                    ><span class="dot"></span><b>type</b> is text</span
+                  >
+                </div>
                 <div class="cardlet-b">
                   <div class="example">
                     <div class="rowline">
                       <div class="fields">
                         <span class="field"
-                          ><span class="k">duration</span
-                          ><span class="v">90 min</span></span
+                          ><span class="k">show_id</span
+                          ><span class="v">s1</span></span
                         >
                         <span class="field"
-                          ><span class="k">date_added</span
-                          ><span class="v">Sep 9, 2019</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">listed_in</span
-                          ><span class="v"
-                            >Dramas, International Movies</span
-                          ></span
+                          ><span class="k">type</span
+                          ><span class="v">Movie</span></span
                         >
                       </div>
-                      <span class="stamp">raw strings</span>
+                      <span class="stamp bad">label = text</span>
                     </div>
                     <div class="rowline">
                       <div class="fields">
                         <span class="field"
-                          ><span class="k">duration</span
-                          ><span class="v">2 Seasons</span></span
+                          ><span class="k">show_id</span
+                          ><span class="v">s2</span></span
                         >
                         <span class="field"
-                          ><span class="k">date_added</span
-                          ><span class="v">Jul 1, 2020</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">listed_in</span
-                          ><span class="v">Kids' TV</span></span
+                          ><span class="k">type</span
+                          ><span class="v">TV Show</span></span
                         >
                       </div>
-                      <span class="stamp">raw strings</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="arrow">→</div>
-
-              <div class="cardlet after">
-                <div class="cardlet-h"><span>After</span></div>
-                <div class="cardlet-b">
-                  <div class="example">
-                    <div class="rowline">
-                      <div class="fields">
-                        <span class="field"
-                          ><span class="k">duration_value</span
-                          ><span class="v derived">90</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">duration_unit</span
-                          ><span class="v derived">min</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">added_year</span
-                          ><span class="v derived">2019</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">added_month</span
-                          ><span class="v derived">9</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">genre_count</span
-                          ><span class="v derived">2</span></span
-                        >
-                      </div>
-                      <span class="stamp good">engineered</span>
-                    </div>
-                    <div class="rowline">
-                      <div class="fields">
-                        <span class="field"
-                          ><span class="k">duration_value</span
-                          ><span class="v derived">2</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">duration_unit</span
-                          ><span class="v derived">seasons</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">added_year</span
-                          ><span class="v derived">2020</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">added_month</span
-                          ><span class="v derived">7</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">genre_count</span
-                          ><span class="v derived">1</span></span
-                        >
-                      </div>
-                      <span class="stamp good">engineered</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="prep-step">
-            <div class="prep-step-head">
-              <div>
-                <div class="prep-step-title">
-                  <span class="prep-step-badge">4</span>
-                  Encode categorical features
-                </div>
-                <p class="prep-step-desc">
-                  Use label encoding to map categorical strings to integers
-                  (e.g., ratings).
-                </p>
-              </div>
-              <div class="prep-step-tags">
-                <span class="prep-tag">LabelEncoder</span>
-                <span class="prep-tag ok">integers</span>
-              </div>
-            </div>
-
-            <div class="transform">
-              <div class="cardlet before">
-                <div class="cardlet-h"><span>Before</span></div>
-                <div class="cardlet-b">
-                  <div class="example">
-                    <div class="rowline">
-                      <div class="fields">
-                        <span class="field"
-                          ><span class="k">rating</span
-                          ><span class="v">TV-MA</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">rating</span
-                          ><span class="v">TV-14</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">rating</span
-                          ><span class="v">PG-13</span></span
-                        >
-                      </div>
-                      <span class="stamp">categorical</span>
+                      <span class="stamp bad">label = text</span>
                     </div>
                   </div>
                 </div>
@@ -1171,60 +1060,10 @@
               <div class="cardlet after">
                 <div class="cardlet-h">
                   <span>After</span>
-                  <span class="pill"
-                    ><span class="dot"></span><b>rating_encoded</b></span
+                  <span class="pill ok"
+                    ><span class="dot"></span><b>y</b> numeric</span
                   >
                 </div>
-                <div class="cardlet-b">
-                  <div class="example">
-                    <div class="rowline">
-                      <div class="fields">
-                        <span class="field"
-                          ><span class="k">TV-MA</span><span class="v">→</span
-                          ><span class="v derived">8</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">TV-14</span><span class="v">→</span
-                          ><span class="v derived">6</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">PG-13</span><span class="v">→</span
-                          ><span class="v derived">4</span></span
-                        >
-                      </div>
-                      <span class="stamp good">encoded</span>
-                    </div>
-                    <p class="note">
-                      Example mapping shown for illustration (values depend on
-                      fitted encoder).
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="prep-step">
-            <div class="prep-step-head">
-              <div>
-                <div class="prep-step-title">
-                  <span class="prep-step-badge">5</span>
-                  Feature selection
-                </div>
-                <p class="prep-step-desc">
-                  Drop identifier and free-text columns; keep compact predictive
-                  features for classical ML models.
-                </p>
-              </div>
-              <div class="prep-step-tags">
-                <span class="prep-tag warn">drop text</span>
-                <span class="prep-tag ok">keep signals</span>
-              </div>
-            </div>
-
-            <div class="transform">
-              <div class="cardlet before">
-                <div class="cardlet-h"><span>Before</span></div>
                 <div class="cardlet-b">
                   <div class="example">
                     <div class="rowline">
@@ -1234,66 +1073,139 @@
                           ><span class="v">s1</span></span
                         >
                         <span class="field"
-                          ><span class="k">title</span
-                          ><span class="v">Example Title</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">description</span
-                          ><span class="v">Long free text…</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">release_year</span
-                          ><span class="v">2019</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">duration_value</span
-                          ><span class="v">90</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">rating_encoded</span
-                          ><span class="v">8</span></span
+                          ><span class="k">y</span
+                          ><span class="v derived">1</span></span
                         >
                       </div>
-                      <span class="stamp bad">too much text</span>
+                      <span class="stamp good">Movie → 1</span>
+                    </div>
+                    <div class="rowline">
+                      <div class="fields">
+                        <span class="field"
+                          ><span class="k">show_id</span
+                          ><span class="v">s2</span></span
+                        >
+                        <span class="field"
+                          ><span class="k">y</span
+                          ><span class="v derived">0</span></span
+                        >
+                      </div>
+                      <span class="stamp good">TV Show → 0</span>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
+          </article>
+        </div>
+      </section>
 
-              <div class="arrow">→</div>
+      <section class="card" id="feature-engineering" style="margin-top: 14px">
+        <h2>Feature Engineering</h2>
 
-              <div class="cardlet after">
-                <div class="cardlet-h"><span>After</span></div>
-                <div class="cardlet-b">
-                  <div class="example">
-                    <div class="rowline">
-                      <div class="fields">
-                        <span class="field"
-                          ><span class="k">release_year</span
-                          ><span class="v derived">2019</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">duration_value</span
-                          ><span class="v derived">90</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">rating_encoded</span
-                          ><span class="v derived">8</span></span
-                        >
-                        <span class="field"
-                          ><span class="k">genre_count</span
-                          ><span class="v derived">2</span></span
-                        >
-                      </div>
-                      <span class="stamp good">kept</span>
-                    </div>
-                    <p class="note">
-                      Dropped: <code class="inline">show_id</code>,
-                      <code class="inline">title</code>,
-                      <code class="inline">description</code>.
-                    </p>
-                  </div>
+        <div class="fe-callout">
+          <h3>🔧 Why Feature Engineering?</h3>
+          <blockquote>
+            ML models only understand <strong>numbers</strong>. Raw data contains many text columns or complex formats → must transform into meaningful numeric values.
+          </blockquote>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top: 12px;">
+          <div style="font-weight:900;">9 Newly Created Features</div>
+          <span class="fe-pill">engineered features</span>
+        </div>
+
+        <div class="fe-table-wrap">
+          <table class="fe-table" role="table">
+            <thead>
+              <tr>
+                <th style="width: 190px;">Feature</th>
+                <th>How It's Created</th>
+                <th style="width: 320px;">Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>duration_value</code></td>
+                <td>Extract number from string</td>
+                <td>"90 min" → <strong>90</strong> · "2 Seasons" → <strong>2</strong></td>
+              </tr>
+              <tr>
+                <td><code>year_added</code></td>
+                <td>Extract from <code>date_added</code></td>
+                <td>"August 8, 2021" → <strong>2021</strong></td>
+              </tr>
+              <tr>
+                <td><code>month_added</code></td>
+                <td>Extract from <code>date_added</code></td>
+                <td>"August 8, 2021" → <strong>8</strong></td>
+              </tr>
+              <tr>
+                <td><code>genre_count</code></td>
+                <td>Count genres in <code>listed_in</code></td>
+                <td>"Dramas, Thrillers, International" → <strong>3</strong></td>
+              </tr>
+              <tr>
+                <td><code>is_multi_country</code></td>
+                <td>Does <code>country</code> contain a comma?</td>
+                <td>"US, UK" → <strong>1</strong> · "India" → <strong>0</strong></td>
+              </tr>
+              <tr>
+                <td><code>has_director</code></td>
+                <td><code>director != 'Unknown'</code>?</td>
+                <td>Director known → <strong>1</strong></td>
+              </tr>
+              <tr>
+                <td><code>has_cast</code></td>
+                <td><code>cast != 'Unknown'</code>?</td>
+                <td>Cast known → <strong>1</strong></td>
+              </tr>
+              <tr>
+                <td><code>years_since_release</code></td>
+                <td><code>year_added - release_year</code></td>
+                <td>2021 - 2015 = <strong>6 years</strong></td>
+              </tr>
+              <tr>
+                <td><code>rating_encoded</code></td>
+                <td>LabelEncoder → integer</td>
+                <td>"TV-MA" → <strong>8</strong> · "PG-13" → <strong>4</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" id="feature-selection-scaling" style="margin-top: 14px">
+        <h2>Feature selection &amp; scaling</h2>
+
+        <div class="prep-steps" style="margin-top: 14px">
+          <article class="prep-step">
+            <div class="prep-step-head">
+              <div>
+                <div class="prep-step-title">
+                  <span class="prep-step-badge">1</span>
+                  Feature selection
                 </div>
+                <p class="prep-step-desc">
+                  Keep compact predictive features and exclude IDs/free-text so classical ML models stay stable and efficient.
+                </p>
+              </div>
+              <div class="prep-step-tags">
+                <span class="prep-tag warn">drop text</span>
+                <span class="prep-tag ok">keep signals</span>
+              </div>
+            </div>
+
+            <div class="fss-panel">
+              <pre><code>Numerical:     release_year · duration_value · year_added
+               month_added · genre_count · years_since_release
+
+Binary (0/1):  is_multi_country · has_director · has_cast
+
+Encoded Cat.:  rating_encoded · country_encoded · genre_encoded</code></pre>
+
+              <div class="fss-excluded">
+                <strong>Excluded:</strong> <code class="inline">show_id</code> (just an ID), <code class="inline">title</code>/<code class="inline">description</code> (require NLP), <code class="inline">type</code> (this IS the target!)
               </div>
             </div>
           </article>
@@ -1302,7 +1214,7 @@
             <div class="prep-step-head">
               <div>
                 <div class="prep-step-title">
-                  <span class="prep-step-badge">6</span>
+                  <span class="prep-step-badge">2</span>
                   Train-test split
                 </div>
                 <p class="prep-step-desc">
@@ -1404,7 +1316,7 @@
             <div class="prep-step-head">
               <div>
                 <div class="prep-step-title">
-                  <span class="prep-step-badge">7</span>
+                  <span class="prep-step-badge">3</span>
                   Feature scaling
                 </div>
                 <p class="prep-step-desc">
