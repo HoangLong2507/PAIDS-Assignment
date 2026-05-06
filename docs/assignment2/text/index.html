@@ -976,7 +976,7 @@
         ></div>
       </section>
 
-      <section class="card" id="details">
+  <section class="card" id="details">
         <h2>Detail Confusion Matrix</h2>
 
         <div class="model-picker">
@@ -1007,6 +1007,61 @@
           <h3 style="margin: 14px 0 8px 0">Confusion matrices</h3>
           <div id="compare-cm" class="compare-cm"></div>
         </div>
+      </section>
+      
+      <section class="card" id="conclusion" style="margin-top:14px">
+        <h2>Conclusion</h2>
+
+        <div class="conclusion-grid" style="display:grid; grid-template-columns: 1fr 320px; gap:14px; align-items:start; margin-top:8px;">
+          <div>
+            <h3>Key Finding — Best Model</h3>
+            <p>After analyzing the dataset and model metrics, we choose <strong>Logistic Regression</strong> as the final model for deployment because it offers a strong balance of performance, speed and interpretability:</p>
+            <ul>
+              <li>✓ <strong>Highest F1-macro</strong> (0.703) — balanced performance across classes</li>
+              <li>✓ <strong>Highest AUC</strong> (0.918) — best ranking ability</li>
+              <li>✓ <strong>Low overfit gap</strong> (9.4%) — generalizes well to held-out data</li>
+              <li>✓ <strong>Fast training</strong> (1.1s) — practical for iteration</li>
+              <li>✓ <strong>Interpretable</strong> — per-word coefficients help explain predictions</li>
+              <li>✓ <code>predict_proba</code> available — enables probability calibration and threshold tuning</li>
+            </ul>
+
+            <h3>Overfitting severity (high → low)</h3>
+            <p>Train F1 vs Test F1 gap:</p>
+            <ul>
+              <li><strong>Random Forest 23.4%</strong> — trees grow unbounded (no <code>max_depth</code>), can memorize training data</li>
+              <li><strong>Linear SVC 15.0%</strong> — C=1 with high-dim TF‑IDF → higher variance</li>
+              <li><strong>XGBoost 13.3%</strong> — 100 trees × depth 6 has capacity to fit noise</li>
+              <li><strong>Logistic Regression 9.4%</strong> — L2 regularization keeps gap smaller</li>
+              <li><strong>Naive Bayes 4.5%</strong> — independence assumption acts as implicit regularizer</li>
+            </ul>
+
+            <h3>Limitations &amp; when this approach fails</h3>
+            <p><strong>Not suitable when:</strong></p>
+            <ul>
+              <li>Business needs to distinguish 4★ vs 5★ (fine-grained rating prediction)</li>
+              <li>Need to detect neutral/mixed reviews specifically (e.g., hotel managers searching for subtle complaints)</li>
+              <li>Reviews come from a very different domain (medical, legal) where vocabulary and semantics differ from TripAdvisor</li>
+            </ul>
+          </div>
+
+          <aside style="min-width:0;">
+            <div class="muted" style="font-size:13px">
+              Quick notes:
+              <ul style="margin-top:6px;">
+                <li>Logistic Regression gives a pragmatic balance between accuracy and explainability for text TF‑IDF pipelines.</li>
+                <li>Consider calibration and threshold tuning on the final model when class probabilities are used in downstream systems.</li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+
+        <style>
+          /* Conclusion styles (scoped) */
+          #conclusion h2 { margin-bottom:6px; }
+          #conclusion h3 { color: rgba(15,23,42,0.95); }
+          #conclusion .muted { color: var(--muted); }
+          @media (max-width: 880px) { /* keep responsive behaviour similar to tabular */ }
+        </style>
       </section>
     </main>
 
