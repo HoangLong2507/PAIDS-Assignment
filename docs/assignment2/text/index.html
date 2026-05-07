@@ -260,6 +260,172 @@
         }
       }
 
+      /* Feature Engineering — TF-IDF section */
+      .fe-callout {
+        margin-top: 10px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(59, 130, 246, 0.16);
+        background: linear-gradient(
+          180deg,
+          rgba(59, 130, 246, 0.08),
+          rgba(37, 99, 235, 0.03)
+        );
+      }
+      .fe-callout h3 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        font-weight: 900;
+      }
+      .fe-callout blockquote {
+        margin: 0;
+        padding: 10px 12px;
+        border-left: 4px solid rgba(59, 130, 246, 0.5);
+        background: rgba(255, 255, 255, 0.75);
+        border-radius: 10px;
+        color: rgba(15, 23, 42, 0.8);
+      }
+      .fe-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(59, 130, 246, 0.18);
+        background: rgba(59, 130, 246, 0.08);
+        font-weight: 800;
+        color: rgba(30, 64, 175, 1);
+        font-size: 12px;
+      }
+      .fe-table-wrap {
+        margin-top: 12px;
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        border-radius: 14px;
+        overflow: hidden;
+        background: linear-gradient(180deg, #ffffff, #fbfdff);
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.04);
+      }
+      table.fe-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 13px;
+      }
+      table.fe-table thead th {
+        background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        font-weight: 900;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+        padding: 12px 14px;
+        text-align: left;
+      }
+      table.fe-table tbody td {
+        padding: 12px 14px;
+        border-top: 1px solid rgba(15, 23, 42, 0.04);
+        vertical-align: top;
+      }
+      table.fe-table tbody tr:nth-child(even) td {
+        background: rgba(15, 23, 42, 0.015);
+      }
+      table.fe-table code {
+        background: rgba(15, 23, 42, 0.03);
+        padding: 3px 6px;
+        border-radius: 7px;
+        border: 1px solid rgba(15, 23, 42, 0.05);
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono",
+          "Courier New", monospace;
+        font-size: 12.5px;
+      }
+      @media (max-width: 720px) {
+        .fe-table-wrap {
+          overflow: auto;
+        }
+        table.fe-table {
+          min-width: 720px;
+        }
+      }
+
+      /* Stat tile (vocab summary) */
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 12px;
+      }
+      @media (max-width: 880px) {
+        .stat-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      .stat-tile {
+        border-radius: 14px;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.95),
+          rgba(248, 250, 252, 0.95)
+        );
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .stat-tile .stat-k {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: rgba(15, 23, 42, 0.55);
+        font-weight: 800;
+      }
+      .stat-tile .stat-v {
+        font-size: 22px;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+        color: rgba(15, 23, 42, 0.95);
+        letter-spacing: -0.02em;
+      }
+      .stat-tile .stat-sub {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      /* Negation chips */
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .ngram-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(34, 197, 94, 0.32);
+        background: rgba(34, 197, 94, 0.1);
+        color: rgba(6, 95, 70, 1);
+        font-weight: 700;
+        font-size: 13px;
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono",
+          monospace;
+      }
+      .ngram-chip::before {
+        content: "✓";
+        font-weight: 900;
+      }
+      .ngram-chip.dropped {
+        border-color: rgba(239, 68, 68, 0.32);
+        background: rgba(239, 68, 68, 0.08);
+        color: rgba(127, 29, 29, 1);
+        text-decoration: line-through;
+      }
+      .ngram-chip.dropped::before {
+        content: "✗";
+      }
+
       /* Section 5: model picker + compare */
       .model-picker {
         margin-top: 12px;
@@ -960,6 +1126,271 @@
               </div>
             </div>
           </article>
+        </div>
+      </section>
+
+      <section
+        class="card"
+        id="feature-engineering"
+        style="margin-top: 14px"
+      >
+        <h2>Feature Engineering — TF-IDF Vectorization</h2>
+
+        <div class="fe-callout">
+          <h3>🔧 Why TF-IDF + Custom Stopwords?</h3>
+          <blockquote>
+            Classical ML models only consume <strong>numbers</strong>. Raw
+            review text must be turned into a numeric matrix that captures
+            <em>which words matter</em> and <em>how distinctive</em> they are
+            per document. We use <strong>TF-IDF (1-2 grams)</strong> and keep
+            negation words so phrases like
+            <code class="inline">not clean</code> survive into the vocabulary
+            instead of collapsing to the misleading unigram
+            <code class="inline">clean</code>.
+          </blockquote>
+        </div>
+
+        <!-- 2.1 Holdout split -->
+        <div class="prep-steps">
+          <article class="prep-step">
+            <div class="prep-step-head">
+              <div>
+                <div class="prep-step-title">
+                  <span class="prep-step-badge">1</span>
+                  Cross Validation — Stratified Holdout (80 / 20)
+                </div>
+                <p class="prep-step-desc">
+                  Split the cleaned corpus once into train / test using
+                  <code class="inline">stratify=y</code> so all 3 sentiment
+                  classes keep the same proportion (positive class is
+                  ~73.7% — without stratification a random split could starve
+                  the minority neutral class in the test set).
+                </p>
+              </div>
+              <div class="prep-step-tags">
+                <span class="prep-tag">80 / 20</span>
+                <span class="prep-tag ok">stratify</span>
+                <span class="prep-tag">random_state=42</span>
+              </div>
+            </div>
+
+            <div class="transform">
+              <div class="cardlet before">
+                <div class="cardlet-h">
+                  <span>Before</span>
+                  <span class="pill"
+                    ><span class="dot" style="background: #ef4444"></span
+                    ><b>Single pool</b></span
+                  >
+                </div>
+                <div class="cardlet-b">
+                  <div class="example">
+                    <div class="rowline">
+                      <div class="fields">
+                        <span class="field"
+                          ><span class="k">dataset</span
+                          ><span class="v">20,491 reviews</span></span
+                        >
+                        <span class="field"
+                          ><span class="k">positive</span
+                          ><span class="v">73.66%</span></span
+                        >
+                        <span class="field"
+                          ><span class="k">negative</span
+                          ><span class="v">15.68%</span></span
+                        >
+                        <span class="field"
+                          ><span class="k">neutral</span
+                          ><span class="v">10.66%</span></span
+                        >
+                      </div>
+                      <span class="stamp bad">imbalanced 6.9×</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="arrow">→</div>
+
+              <div class="cardlet after">
+                <div class="cardlet-h">
+                  <span>After</span>
+                  <span class="pill"
+                    ><span class="dot" style="background: #22c55e"></span
+                    ><b>Stratified split</b></span
+                  >
+                </div>
+                <div class="cardlet-b">
+                  <div class="example">
+                    <div class="rowline">
+                      <div class="fields">
+                        <span class="field"
+                          ><span class="k">split</span
+                          ><span class="v" style="color: #1e40af"
+                            >train</span
+                          ></span
+                        >
+                        <span class="field"
+                          ><span class="k">rows</span
+                          ><span class="v">16,392</span></span
+                        >
+                        <span class="field"
+                          ><span class="k">share</span
+                          ><span class="v">80%</span></span
+                        >
+                      </div>
+                      <span class="stamp good">class % preserved</span>
+                    </div>
+                    <div class="rowline">
+                      <div class="fields">
+                        <span class="field"
+                          ><span class="k">split</span
+                          ><span class="v" style="color: #1e40af"
+                            >test</span
+                          ></span
+                        >
+                        <span class="field"
+                          ><span class="k">rows</span
+                          ><span class="v">4,099</span></span
+                        >
+                        <span class="field"
+                          ><span class="k">share</span
+                          ><span class="v">20%</span></span
+                        >
+                      </div>
+                      <span class="stamp good">class % preserved</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 2.2 TF-IDF config -->
+          <article class="prep-step">
+            <div class="prep-step-head">
+              <div>
+                <div class="prep-step-title">
+                  <span class="prep-step-badge">2</span>
+                  TF-IDF Vectorizer — Configuration
+                </div>
+                <p class="prep-step-desc">
+                  A single
+                  <code class="inline">TfidfVectorizer</code> turns each review
+                  into a sparse 10,000-dim vector. Each parameter trades off
+                  vocabulary size, robustness to noise, and signal preservation.
+                </p>
+              </div>
+              <div class="prep-step-tags">
+                <span class="prep-tag">unigrams + bigrams</span>
+                <span class="prep-tag">sublinear TF</span>
+                <span class="prep-tag ok">negation-aware</span>
+              </div>
+            </div>
+
+            <div class="fe-table-wrap">
+              <table class="fe-table" role="table">
+                <thead>
+                  <tr>
+                    <th style="width: 200px">Parameter</th>
+                    <th style="width: 180px">Value</th>
+                    <th>Why this choice?</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>max_features</code></td>
+                    <td><strong>10,000</strong></td>
+                    <td>
+                      Cap vocabulary at the 10k most frequent terms — keeps the
+                      sparse matrix small enough for fast training while
+                      retaining the dominant signal vocabulary.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>ngram_range</code></td>
+                    <td><strong>(1, 2)</strong></td>
+                    <td>
+                      Mix unigrams + bigrams so phrases like
+                      <code>not clean</code>, <code>highly recommend</code>,
+                      <code>great location</code> become single features —
+                      preserves local word order that bag-of-words alone loses.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>min_df</code></td>
+                    <td><strong>2</strong></td>
+                    <td>
+                      Drop tokens that appear in only one document —
+                      removes typos, proper nouns, and one-off noise that can't
+                      generalize.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>max_df</code></td>
+                    <td><strong>0.8</strong></td>
+                    <td>
+                      Drop tokens present in more than 80% of documents —
+                      removes corpus-specific filler (e.g.,
+                      <code>hotel</code>, <code>room</code>) that have no
+                      discriminative power.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>stop_words</code></td>
+                    <td>
+                      <strong>custom</strong>
+                      <br /><code>ENGLISH_STOP_WORDS − NEGATIONS</code>
+                    </td>
+                    <td>
+                      <strong>Critical fix:</strong> sklearn's default English
+                      stoplist drops
+                      <code>not, no, never, cannot, none, nor, …</code> — that
+                      would erase the negation cleanup done in step 3 of
+                      preprocessing. We subtract those words back so bigrams
+                      like <code>not good</code> survive.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>sublinear_tf</code></td>
+                    <td><strong>True</strong></td>
+                    <td>
+                      Replace raw term frequency
+                      <em>tf</em> with <code>1 + log(tf)</code>. A word that
+                      appears 10× isn't 10× more important than appearing 1×;
+                      log-scaling dampens the dominance of repeated words in
+                      long reviews.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Vocab stats -->
+            <div class="stat-grid">
+              <div class="stat-tile">
+                <span class="stat-k">Vocabulary</span>
+                <span class="stat-v">10,000</span>
+                <span class="stat-sub">unique 1-2grams</span>
+              </div>
+              <div class="stat-tile">
+                <span class="stat-k">Train matrix</span>
+                <span class="stat-v">16,392 × 10k</span>
+                <span class="stat-sub">sparse TF-IDF</span>
+              </div>
+              <div class="stat-tile">
+                <span class="stat-k">Test matrix</span>
+                <span class="stat-v">4,099 × 10k</span>
+                <span class="stat-sub">transformed by train vocab</span>
+              </div>
+              <div class="stat-tile">
+                <span class="stat-k">Fit + transform time</span>
+                <span class="stat-v">10.39s</span>
+                <span class="stat-sub">on the full corpus</span>
+              </div>
+            </div>
+          </article>
+
         </div>
       </section>
 
