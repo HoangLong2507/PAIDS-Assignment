@@ -1,267 +1,663 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Assignment 2 (Image): Image ML Pipeline" />
-    <title>Assignment 2: Image  Pipeline</title>
 
-    <link rel="stylesheet" href="../../static/assignment1.styles.css" />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Assignment 2 (Image): CUB-200-2011 Classification" />
+  <title>Assignment 2: Image Classification Pipeline</title>
 
-    <style>
-      /* Layout modifiers */
-      .muted {
-        color: var(--muted);
-      }
+  <link rel="stylesheet" href="../../static/assignment1.styles.css" />
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
 
-      .metrics-table-wrap {
-        border: 1px solid rgba(15, 23, 42, 0.06);
-        border-radius: 12px;
-        overflow: hidden;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 250, 250, 0.98));
-        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.03);
-      }
-      
-      .metrics-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-      }
-      
-      .metrics-table thead th {
-        background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
-        color: white;
-        font-weight: 800;
-        font-size: 14px;
-        text-align: left;
-        padding: 14px 18px;
-        border-bottom: 1px solid rgba(15, 23, 42, 0.06);
-      }
-      
-      .metrics-table tbody td {
-        padding: 14px 18px;
-        border-top: 1px solid rgba(15, 23, 42, 0.04);
-        vertical-align: middle;
-        font-size: 14px;
-        color: rgba(15, 23, 42, 0.85);
-      }
-      
-      .metrics-table tbody tr:nth-child(even) td {
-        background: rgba(15, 23, 42, 0.02);
-      }
+  <style>
+    .muted {
+      color: var(--muted);
+    }
 
-      .metrics-table tbody tr:hover td {
-        background: rgba(59, 130, 246, 0.04);
-      }
+    .kpi {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
 
-      .metrics-table td strong {
-        color: rgba(15, 23, 42, 1);
-        font-weight: 700;
-      }
-      
-      /* Toggle Buttons Styling */
-      .toggle-btns {
-        display: flex;
-        gap: 12px;
-        margin: 20px 0;
-      }
-      
-      .chip-btn {
-        background: white;
-        color: rgba(15, 23, 42, 0.7);
-        border: 1px solid rgba(15, 23, 42, 0.1);
-        padding: 10px 20px;
-        border-radius: 10px;
-        font-weight: 800;
-        cursor: pointer;
-        transition: all 150ms ease;
-        font-size: 14px;
-      }
-      
-      .chip-btn.active {
-        background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
-        color: white;
-        border-color: transparent;
-        box-shadow: 0 8px 22px rgba(37, 99, 235, 0.12);
-      }
-      
-      .chip-btn:hover:not(.active) {
-        background: rgba(15, 23, 42, 0.02);
-        transform: translateY(-1px);
-        color: rgba(15, 23, 42, 0.9);
-      }
+    .kpi>div {
+      grid-column: span 3;
+      border: 1px solid rgba(15, 23, 42, .08);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(255, 255, 255, .8);
+    }
 
-      /* Transitions for sections */
-      .table-view {
-        display: none;
-        animation: fadeIn 0.4s ease forwards;
-        opacity: 0;
+    @media (max-width: 900px) {
+      .kpi>div {
+        grid-column: span 6;
       }
-      
-      .table-view.active {
-        display: block;
-      }
+    }
 
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0); }
+    @media (max-width: 640px) {
+      .kpi>div {
+        grid-column: span 12;
       }
+    }
 
-      .highlight-bad {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 10px;
-        border-radius: 8px;
-        background: rgba(239, 68, 68, 0.1);
-        color: rgba(185, 28, 28, 1);
-        font-weight: 800;
+    .table-wrap {
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      border-radius: 12px;
+      overflow: auto;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(250, 250, 250, .98));
+    }
+
+    table.metrics {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 14px;
+    }
+
+    table.metrics thead th {
+      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+      color: #fff;
+      text-align: left;
+      padding: 12px 14px;
+    }
+
+    table.metrics tbody td {
+      padding: 12px 14px;
+      border-top: 1px solid rgba(15, 23, 42, .05);
+    }
+
+    table.metrics tbody tr:nth-child(even) td {
+      background: rgba(15, 23, 42, .02);
+    }
+
+    .two-up {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .two-up {
+        grid-template-columns: 1fr;
       }
-    </style>
-  </head>
+    }
 
-  <body>
-    <header class="topbar">
-      <div class="container">
-        <div class="nav">
-          <a class="brand" href="../../index.html" aria-label="Back to home">
-            <div class="brand-badge" aria-hidden="true"></div>
-            <div class="brand-text">
-              <div class="brand-title">PAIDS Assignments</div>
-              <div class="brand-sub">Assignment 2 • Image • Bird ML</div>
+    .plot {
+      min-height: 420px;
+      border: 1px solid rgba(15, 23, 42, .08);
+      border-radius: 12px;
+      padding: 8px;
+      background: rgba(255, 255, 255, .9);
+    }
+
+    .selector-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    select {
+      border: 1px solid rgba(15, 23, 42, .12);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font: inherit;
+      background: #fff;
+    }
+
+    .hint {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .note {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px dashed rgba(59, 130, 246, .35);
+      background: rgba(59, 130, 246, .06);
+      font-size: 13px;
+    }
+
+    .pipeline-wrap {
+      margin-top: 10px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 10px;
+    }
+
+    .pipeline-step {
+      grid-column: span 3;
+      border: 1px solid rgba(15, 23, 42, .08);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .9);
+      padding: 12px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, .04);
+    }
+
+    .pipeline-step h4 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+    }
+
+    .pipeline-step p {
+      margin: 0;
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .shape-pill {
+      margin-top: 8px;
+      display: inline-block;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(37, 99, 235, .22);
+      background: rgba(37, 99, 235, .08);
+      color: rgba(30, 64, 175, 1);
+      font-weight: 700;
+    }
+
+    .feature-illustration {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 12px;
+      padding: 10px;
+      border: 1px solid rgba(15, 23, 42, .08);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .95);
+    }
+
+    .feature-original,
+    .feature-map {
+      border-radius: 10px;
+      border: 1px solid rgba(15, 23, 42, .08);
+      background: rgba(255, 255, 255, .92);
+      padding: 8px;
+    }
+
+    .feature-original img,
+    .feature-map img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 8px;
+      display: block;
+    }
+
+    .feature-caption {
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(15, 23, 42, .85);
+      text-align: center;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .feature-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      margin: 6px 0;
+      color: rgba(59, 130, 246, .85);
+      font-weight: 900;
+      font-size: 16px;
+    }
+
+    @media (max-width: 980px) {
+      .feature-illustration {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .pipeline-step {
+        grid-column: span 6;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .pipeline-step {
+        grid-column: span 12;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="../../index.html" aria-label="Back to home">
+          <div class="brand-badge" aria-hidden="true"></div>
+          <div class="brand-text">
+            <div class="brand-title">PAIDS Assignments</div>
+            <div class="brand-sub">Assignment 2 • Image • CUB-200-2011</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="return-btn">
+      <a class="btn" href="../" style="text-decoration: none; color: black">← Back</a>
+    </div>
+
+    <section class="card part-card" id="top">
+      <h1 class="part-title">🖼️ Image Classification Pipeline</h1>
+    </section>
+
+    <section class="card" style="margin-top: 14px">
+      <h2>Dataset Overview</h2>
+      <p class="muted">Caltech-UCSD Birds-200-2011 (CUB-200-2011), transfer learning + classical ML baselines on
+        extracted ResNet50 features.</p>
+      <div class="kpi" id="kpi"></div>
+    </section>
+
+    <section class="card" style="margin-top: 14px">
+      <h2>Step Visualization: Data Pipeline → Feature Extractor → Evaluation</h2>
+      <p class="muted">From image tensor transforms to 2048-D embeddings for classical ML training.</p>
+
+      <div class="pipeline-wrap">
+        <div class="pipeline-grid">
+          <article class="pipeline-step">
+            <h4>1) Input Image</h4>
+            <p>RGB bird image loaded with PIL.</p>
+            <span class="shape-pill">H × W × 3</span>
+          </article>
+
+          <article class="pipeline-step">
+            <h4>2) Tensor Transform</h4>
+            <p>Resize(256) → Crop(224) → Flip/Jitter (train) → ToTensor → Normalize(ImageNet).</p>
+            <span class="shape-pill">3 × 224 × 224</span>
+          </article>
+
+          <article class="pipeline-step">
+            <h4>3) Batch Loader</h4>
+            <p>DataLoader batches tensors for GPU/CPU inference.</p>
+            <span class="shape-pill">B × 3 × 224 × 224</span>
+          </article>
+
+          <article class="pipeline-step">
+            <h4>4) ResNet50 Feature Extractor</h4>
+            <p>Backbone forward pass with <code>fc = Identity()</code> to get deep embeddings.</p>
+            <span class="shape-pill">B × 2048</span>
+          </article>
+        </div>
+
+        <div class="feature-illustration" aria-label="Feature extraction illustration from input image to feature maps">
+          <div class="feature-original">
+            <img src="./data/illustration/original_image.png" alt="Original bird image input" />
+            <div class="feature-caption">Input image (after resize/crop)</div>
+            <div class="feature-arrow">↓ Feature extraction (ResNet50) ↓</div>
+          </div>
+
+          <div class="feature-grid">
+            <div class="feature-map">
+              <img src="./data/illustration/feature_map_0.png" alt="Feature map 0" />
+              <div class="feature-caption">Feature Map 0</div>
             </div>
-          </a>
-        </div>
-      </div>
-    </header>
-
-    <main class="container">
-      <div class="return-btn">
-        <a class="btn" href="../" style="text-decoration: none; color: black">← Back</a>
-      </div>
-      <section class="card part-card" id="top">
-        <h1 class="part-title">🖼️ Image ML Pipeline</h1>
-      </section>
-
-      <section class="card" id="model-result-comparison" style="margin-top: 14px">
-        <h2>Model Result and comparisons</h2>
-        
-        <div class="toggle-btns">
-          <button class="chip-btn active" id="btn-performance" onclick="showSection('performance')">Performance</button>
-          <button class="chip-btn" id="btn-resource" onclick="showSection('resource')">Resource</button>
-        </div>
-
-        <!-- Performance Table -->
-        <div id="section-performance" class="table-view active">
-          <div class="metrics-table-wrap">
-            <table class="metrics-table" role="table">
-              <thead>
-                <tr>
-                  <th>Model</th>
-                  <th>Accuracy</th>
-                  <th>Top-5</th>
-                  <th>Precision</th>
-                  <th>Recall</th>
-                  <th>F1-score</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>ResNet-50 (Fine-tuned)</strong></td>
-                  <td>0.7038</td>
-                  <td>0.9156</td>
-                  <td>0.7333</td>
-                  <td>0.7055</td>
-                  <td>0.7049</td>
-                </tr>
-                <tr>
-                  <td><strong>Logistic Regression</strong></td>
-                  <td>0.6531</td>
-                  <td>0.8895</td>
-                  <td>0.6633</td>
-                  <td>0.6562</td>
-                  <td>0.6559</td>
-                </tr>
-                <tr>
-                  <td><strong>Random Forest</strong></td>
-                  <td>0.5742</td>
-                  <td>0.8416</td>
-                  <td>0.5803</td>
-                  <td>0.5773</td>
-                  <td>0.5642</td>
-                </tr>
-                <tr>
-                  <td><strong>KNN (k=5)</strong></td>
-                  <td>0.4888</td>
-                  <td>0.7522</td>
-                  <td>0.5277</td>
-                  <td>0.4933</td>
-                  <td>0.4881</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="feature-map">
+              <img src="./data/illustration/feature_map_1.png" alt="Feature map 1" />
+              <div class="feature-caption">Feature Map 1</div>
+            </div>
+            <div class="feature-map">
+              <img src="./data/illustration/feature_map_2.png" alt="Feature map 2" />
+              <div class="feature-caption">Feature Map 2</div>
+            </div>
+            <div class="feature-map">
+              <img src="./data/illustration/feature_map_3.png" alt="Feature map 3" />
+              <div class="feature-caption">Feature Map 3</div>
+            </div>
+            <div class="feature-map">
+              <img src="./data/illustration/feature_map_4.png" alt="Feature map 4" />
+              <div class="feature-caption">Feature Map 4</div>
+            </div>
+            <div class="feature-map">
+              <img src="./data/illustration/feature_map_5.png" alt="Feature map 5" />
+              <div class="feature-caption">Feature Map 5</div>
+            </div>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- Resource Table -->
-        <div id="section-resource" class="table-view">
-          <div class="metrics-table-wrap">
-            <table class="metrics-table" role="table">
-              <thead>
-                <tr>
-                  <th>Model</th>
-                  <th>Training Time (s)</th>
-                  <th>Inference Time (ms/image)</th>
-                  <th>Model Size (MB)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>ResNet-50 (Fine-tuned)</strong></td>
-                  <td>1224.0</td>
-                  <td>7.039</td>
-                  <td>91.54</td>
-                </tr>
-                <tr>
-                  <td><strong>Logistic Regression</strong></td>
-                  <td>69.92</td>
-                  <td>0.035</td>
-                  <td>3.13</td>
-                </tr>
-                <tr>
-                  <td><strong>Random Forest</strong></td>
-                  <td>506.32</td>
-                  <td>0.246</td>
-                  <td><span class="highlight-bad">❌ 2228.49</span></td>
-                </tr>
-                <tr>
-                  <td><strong>KNN (k=5)</strong></td>
-                  <td>0.009</td>
-                  <td>0.473</td>
-                  <td>46.88</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+    <section class="card" style="margin-top: 14px">
+      <h2>Model Metrics</h2>
+      <div class="table-wrap">
+        <table class="metrics" id="metrics-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Accuracy</th>
+              <th>Top-5</th>
+              <th>Precision</th>
+              <th>Recall</th>
+              <th>F1</th>
+              <th>Train (s)</th>
+              <th>Infer (ms/img)</th>
+              <th>Size (MB)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top: 14px">
+      <h2>Visual Comparison</h2>
+      <div class="two-up">
+        <div id="chart-performance" class="plot"></div>
+        <div id="chart-resource" class="plot"></div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top: 14px">
+      <h2>Confusion Matrix</h2>
+      <div class="selector-row">
+        <label for="cm-model"><strong>Select model:</strong></label>
+        <select id="cm-model"></select>
+      </div>
+      <div id="cm-plot" class="plot"></div>
+      <p class="hint" id="cm-hint"></p>
+      <div class="note">
+        Loaded from the exported JSON files in
+        <code>docs/assignment2/image/data/confusion_matrix/</code>.
+      </div>
+    </section>
+
+    <section class="card" id="conclusion" style="margin-top:14px">
+      <h2>Conclusion: Solving the Fine-Grained Bird Classification Problem</h2>
+
+      <div class="conclusion-grid"
+        style="display:grid; grid-template-columns: 1fr 320px; gap:14px; align-items:start; margin-top:8px;">
+        <div>
+          <h3 style="margin:0 0 8px 0; font-size:16px">1. The Core Problem</h3>
+          <p class="muted" style="margin-top:6px">The image task was to classify CUB-200-2011 bird images into
+            <strong>200 visually similar species</strong>. This is a fine-grained recognition problem where many classes
+            differ by small details such as color patterns, wing markings, beak shape, or pose. Because of this, simple
+            pixel-based features are not sufficient.
+          </p>
+
+          <h3 style="margin:12px 0 8px 0; font-size:16px">2. The Solution &amp; Pipeline</h3>
+          <ul style="margin:6px 0 0 18px">
+            <li><strong>Preprocessing</strong>: resize and crop images to 224×224, apply training augmentation, convert
+              to tensors, and normalize with ImageNet statistics.</li>
+            <li><strong>Feature extraction</strong>: use ImageNet-pretrained ResNet-50 as a backbone and export
+              <strong>2048-dimensional embeddings</strong> for classical machine-learning models.</li>
+            <li><strong>Model comparison</strong>: evaluate Logistic Regression, Random Forest, KNN, and a fully
+              fine-tuned ResNet-50 using accuracy, Top-5 accuracy, macro precision, macro recall, macro F1, inference
+              time, and model size.</li>
+          </ul>
+
+          <h3 style="margin:12px 0 8px 0; font-size:16px">3. Final Choice</h3>
+          <p class="muted" style="margin-top:6px">The <strong>fine-tuned ResNet-50</strong> is the best final model for
+            maximum classification quality. It achieves the highest Top-1 accuracy (<strong>70.38%</strong>), Top-5
+            accuracy (<strong>91.56%</strong>), and macro F1 (<strong>0.7049</strong>), showing that end-to-end
+            adaptation of the CNN features improves fine-grained bird recognition.</p>
+
+          <p class="muted" style="margin-top:8px">For a lightweight deployment scenario, <strong>Logistic
+              Regression</strong> is the strongest practical baseline. It reaches <strong>65.31%</strong> accuracy and
+            <strong>88.95%</strong> Top-5 accuracy with very fast inference and a small 3.13 MB model, making it a good
+            trade-off when GPU fine-tuning or large model storage is not available.
+          </p>
         </div>
-      </section>
 
-    </main>
+        <aside style="min-width:0;">
+          <div
+            style="padding:12px; border-radius:12px; border:1px solid rgba(15,23,42,0.06); background:linear-gradient(180deg,#ffffff,#fbfdff); box-shadow:0 6px 18px rgba(15,23,42,0.04);">
+            <p style="margin:0 0 8px 0; font-weight:900">Key takeaways</p>
+            <ul style="margin:8px 0 0 14px;">
+              <li><strong>Best model:</strong> Fine-tuned ResNet-50</li>
+              <li><strong>Top-1 accuracy:</strong> 70.38%</li>
+              <li><strong>Top-5 accuracy:</strong> 91.56%</li>
+              <li><strong>Best baseline:</strong> Logistic Regression on ResNet-50 features</li>
+              <li><strong>Weakest model:</strong> KNN, due to lower accuracy and slower per-image lookup</li>
+            </ul>
 
-    <script>
-      function showSection(sectionId) {
-        // Reset buttons
-        document.getElementById('btn-performance').classList.remove('active');
-        document.getElementById('btn-resource').classList.remove('active');
-        
-        // Reset sections
-        document.getElementById('section-performance').classList.remove('active');
-        document.getElementById('section-resource').classList.remove('active');
-        
-        // Activate selected
-        document.getElementById('btn-' + sectionId).classList.add('active');
-        document.getElementById('section-' + sectionId).classList.add('active');
+            <div
+              style="margin-top:12px; padding:10px; border-radius:10px; background:rgba(59,130,246,0.06); text-align:center; font-weight:800; color:rgb(30,64,175)">
+              Final verdict: fine-tuned ResNet-50 for quality, Logistic Regression for efficiency
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <style>
+        /* Conclusion styles (scoped) */
+        #conclusion h2 {
+          margin-bottom: 6px;
+        }
+
+        #conclusion h3 {
+          color: rgba(15, 23, 42, 0.95);
+        }
+
+        #conclusion .muted {
+          color: var(--muted);
+        }
+
+        @media (max-width: 880px) {
+          .conclusion-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      </style>
+    </section>
+  </main>
+
+  <script>
+    async function loadJSON(url) {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`Failed to fetch ${url}: ${r.status}`);
+      return r.json();
+    }
+
+    const fmtPct = (v) => (v == null ? "-" : `${(v * 100).toFixed(2)}%`);
+    const fmtNum = (v, d = 3) => (v == null ? "-" : Number(v).toFixed(d));
+
+    function renderKPIs(overview) {
+      const kpi = document.getElementById("kpi");
+      const cards = [
+        ["Classes", overview.num_classes],
+        ["Train / Val / Test", `${overview.train_samples} / ${overview.val_samples} / ${overview.test_samples}`],
+        ["Feature Dim", overview.feature_dim],
+        ["Backbone", overview.backbone],
+      ];
+      kpi.innerHTML = cards
+        .map(([k, v]) => `<div><div class="metric-label">${k}</div><div class="metric-value">${v}</div></div>`)
+        .join("");
+    }
+
+    function renderTable(models) {
+      const tbody = document.querySelector("#metrics-table tbody");
+      tbody.innerHTML = models
+        .map((m) => `
+            <tr>
+              <td><strong>${m.name}</strong></td>
+              <td>${fmtPct(m.metrics.accuracy)}</td>
+              <td>${fmtPct(m.metrics.top5)}</td>
+              <td>${fmtPct(m.metrics.precision)}</td>
+              <td>${fmtPct(m.metrics.recall)}</td>
+              <td>${fmtPct(m.metrics.f1)}</td>
+              <td>${fmtNum(m.metrics.train_seconds, 2)}</td>
+              <td>${fmtNum(m.metrics.infer_ms_per_image, 3)}</td>
+              <td>${fmtNum(m.metrics.model_size_mb, 2)}</td>
+            </tr>`)
+        .join("");
+    }
+
+    function renderCharts(models) {
+      const names = models.map((m) => m.name);
+      const acc = models.map((m) => m.metrics.accuracy * 100);
+      const f1 = models.map((m) => m.metrics.f1 * 100);
+      const top5 = models.map((m) => (m.metrics.top5 == null ? null : m.metrics.top5 * 100));
+
+      Plotly.newPlot(
+        "chart-performance",
+        [
+          { type: "bar", x: names, y: acc, name: "Accuracy", marker: { color: "#2563eb" } },
+          { type: "bar", x: names, y: f1, name: "F1", marker: { color: "#7c3aed" } },
+          { type: "bar", x: names, y: top5, name: "Top-5", marker: { color: "#06b6d4" } },
+        ],
+        {
+          barmode: "group",
+          title: "Performance Metrics (%)",
+          yaxis: { title: "%", range: [0, 100] },
+          margin: { l: 60, r: 16, t: 50, b: 90 },
+        },
+        { responsive: true, displaylogo: false }
+      );
+
+      Plotly.newPlot(
+        "chart-resource",
+        [
+          {
+            type: "bar",
+            x: names,
+            y: models.map((m) => m.metrics.train_seconds),
+            name: "Train (s)",
+            marker: { color: "#f59e0b" },
+          },
+          {
+            type: "scatter",
+            mode: "lines+markers",
+            x: names,
+            y: models.map((m) => m.metrics.infer_ms_per_image),
+            name: "Infer (ms/img)",
+            yaxis: "y2",
+            marker: { color: "#ef4444", size: 8 },
+            line: { color: "#ef4444" },
+          },
+        ],
+        {
+          title: "Resource Metrics",
+          yaxis: { title: "Train (s)" },
+          yaxis2: {
+            title: "Infer (ms/img)",
+            overlaying: "y",
+            side: "right",
+          },
+          margin: { l: 60, r: 60, t: 50, b: 90 },
+        },
+        { responsive: true, displaylogo: false }
+      );
+    }
+
+    async function renderConfusionMatrix(models) {
+      const select = document.getElementById("cm-model");
+      const hint = document.getElementById("cm-hint");
+
+      const confusionMatrixFiles = {
+        Logistic_Regression: "logistic_regression_confusion_matrix.json",
+        Random_Forest: "random_forest_confusion_matrix.json",
+        KNN_5: "knn_(k=5)_confusion_matrix.json",
+      };
+
+      const confusionModels = models.filter((m) => confusionMatrixFiles[m.id]);
+      select.innerHTML = confusionModels.map((m) => `<option value="${m.id}">${m.name}</option>`).join("");
+
+      async function draw(modelId) {
+        const m = confusionModels.find((x) => x.id === modelId);
+        const fileName = confusionMatrixFiles[modelId];
+        const url = `./data/confusion_matrix/${fileName}`;
+        try {
+          const cm = await loadJSON(url);
+          const z = cm.matrix || [];
+          const labelCount = cm.num_classes || z.length;
+          const labels = cm.labels && cm.labels.length
+            ? cm.labels
+            : Array.from({ length: labelCount }, (_, i) => String(i));
+          const title = cm.model || m.name;
+
+          await Plotly.newPlot(
+            "cm-plot",
+            [{
+              type: "heatmap",
+              z,
+              x: labels,
+              y: labels,
+              colorscale: "Blues",
+              hoverongaps: false,
+            }],
+            {
+              title: `Confusion Matrix — ${title}`,
+              xaxis: { title: "Predicted" },
+              yaxis: { title: "True", autorange: "reversed" },
+              margin: { l: 80, r: 20, t: 60, b: 80 },
+            },
+            { responsive: true, displaylogo: false }
+          );
+          hint.textContent = `Loaded: ${url}`;
+        } catch (err) {
+          await Plotly.newPlot(
+            "cm-plot",
+            [],
+            {
+              title: `Confusion Matrix — ${m.name}`,
+              annotations: [{
+                text: "No confusion-matrix JSON found for this model yet.<br>Export from Colab and save it as indicated below.",
+                showarrow: false,
+                x: 0.5,
+                y: 0.5,
+                xref: "paper",
+                yref: "paper",
+                font: { size: 14 },
+              }],
+              xaxis: { visible: false },
+              yaxis: { visible: false },
+            },
+            { responsive: true, displaylogo: false }
+          );
+          hint.textContent = `Missing file: ${url}`;
+        }
       }
-    </script>
-  </body>
+
+      select.addEventListener("change", (e) => draw(e.target.value));
+      if (confusionModels.length > 0) {
+        await draw(confusionModels[0].id);
+      }
+    }
+
+    (async () => {
+      const [overview, modelBlob] = await Promise.all([
+        loadJSON("./data/overview.json"),
+        loadJSON("./data/models.json"),
+      ]);
+      const models = modelBlob.models || [];
+
+      renderKPIs(overview);
+      renderTable(models);
+      renderCharts(models);
+      await renderConfusionMatrix(models);
+    })().catch((err) => console.error(err));
+  </script>
+</body>
+
 </html>

@@ -1,0 +1,9 @@
+{
+  "dataset": "CUB_200_2011",
+  "num_classes": 200,
+  "train_samples": 5394,
+  "val_samples": 600,
+  "test_samples": 5794,
+  "feature_dim": 2048,
+  "backbone": "ResNet-50 (ImageNet pretrained)"
+}

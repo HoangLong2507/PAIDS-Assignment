@@ -1,0 +1,60 @@
+{
+  "models": [
+    {
+      "id": "ResNet50_Finetuned",
+      "name": "ResNet-50 (Fine-tuned)",
+      "metrics": {
+        "accuracy": 0.7038,
+        "top5": 0.9156,
+        "precision": 0.7333,
+        "recall": 0.7055,
+        "f1": 0.7049,
+        "train_seconds": 1224.0,
+        "infer_ms_per_image": 7.039,
+        "model_size_mb": 91.54
+      }
+    },
+    {
+      "id": "Logistic_Regression",
+      "name": "Logistic Regression",
+      "metrics": {
+        "accuracy": 0.6531,
+        "top5": 0.8895,
+        "precision": 0.6633,
+        "recall": 0.6562,
+        "f1": 0.6559,
+        "train_seconds": 69.92,
+        "infer_ms_per_image": 0.035,
+        "model_size_mb": 3.13
+      }
+    },
+    {
+      "id": "Random_Forest",
+      "name": "Random Forest",
+      "metrics": {
+        "accuracy": 0.5742,
+        "top5": 0.8416,
+        "precision": 0.5803,
+        "recall": 0.5773,
+        "f1": 0.5642,
+        "train_seconds": 506.32,
+        "infer_ms_per_image": 0.246,
+        "model_size_mb": 2228.49
+      }
+    },
+    {
+      "id": "KNN_5",
+      "name": "KNN (k=5)",
+      "metrics": {
+        "accuracy": 0.4888,
+        "top5": 0.7522,
+        "precision": 0.5277,
+        "recall": 0.4933,
+        "f1": 0.4881,
+        "train_seconds": 0.009,
+        "infer_ms_per_image": 0.473,
+        "model_size_mb": 46.88
+      }
+    }
+  ]
+}
